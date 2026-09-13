@@ -1,0 +1,5 @@
+# Local secrets for the Cloudflare runtime (copy to .dev.vars)
+# Turnstile test secret that always passes.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+# Leave empty in development: submitted enquiries are logged to the console instead of emailed.
+RESEND_API_KEY=

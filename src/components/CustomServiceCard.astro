@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { pagePath, useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { lang, headingLevel: Heading = 'h3' } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<a
+  href={pagePath('contact', lang)}
+  class="group flex h-full flex-col rounded-2xl bg-brand-500 p-6 text-navy-900 transition hover:bg-brand-400 sm:p-7"
+>
+  <span class="grid size-12 place-items-center rounded-xl bg-navy-900 text-brand-500">
+    <Icon name="shieldCheck" class="size-6" />
+  </span>
+  <Heading class="mt-5 text-lg font-bold">{t.services.customTitle}</Heading>
+  <p class="mt-2 flex-1 text-sm leading-relaxed text-navy-800">{t.services.customText}</p>
+  <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold">
+    {t.nav.requestQuote}
+    <Icon name="arrowRight" class="size-4 transition group-hover:translate-x-1" />
+  </span>
+</a>

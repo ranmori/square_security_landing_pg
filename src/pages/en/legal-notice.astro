@@ -1,0 +1,77 @@
+---
+import LegalPage from '../../components/pages/LegalPage.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import { company, phoneLabel } from '../../data/company';
+import { pagePath } from '../../i18n/ui';
+---
+
+<LegalPage lang="en" page="imprint" title="Legal notice">
+  <p>
+    This is a translation for convenience. The <a href={pagePath('imprint', 'de')} lang="de">German version (Impressum)</a> is legally
+    binding.
+  </p>
+
+  <h2>Information pursuant to Section 5 DDG</h2>
+  <p>
+    {company.legalName}<br />
+    {company.street}<br />
+    {company.postalCode} {company.city}<br />
+    Germany
+  </p>
+
+  <h2>Represented by</h2>
+  <p>Managing director: {company.ceo}</p>
+
+  <h2>Contact</h2>
+  <p>
+    Phone: <a href={`tel:${company.phoneE164}`}>{phoneLabel('en')}</a><br />
+    Email: <a href={`mailto:${company.email}`}>{company.email}</a>
+  </p>
+
+  <h2>Commercial register</h2>
+  <p>
+    Registered in the commercial register (Handelsregister)<br />
+    Register court: <Placeholder>local court – to be added</Placeholder><br />
+    Registration number: <Placeholder>HRB – to be added</Placeholder>
+  </p>
+
+  <h2>VAT ID</h2>
+  <p>
+    VAT identification number pursuant to Section 27a of the German VAT Act:<br />
+    <Placeholder>DE – to be added</Placeholder>
+  </p>
+
+  <h2>Licence pursuant to Section 34a GewO</h2>
+  <p>
+    Licence for the security business pursuant to Section 34a of the German Trade Regulation Act (Gewerbeordnung).<br />
+    Supervisory authority: <Placeholder>authority and address – to be added</Placeholder>
+  </p>
+
+  <h2>Responsible for content pursuant to Section 18 (2) MStV</h2>
+  <p>
+    {company.ceo}<br />
+    {company.street}, {company.postalCode} {company.city}, Germany
+  </p>
+
+  <h2>Consumer dispute resolution</h2>
+  <p>We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.</p>
+
+  <h2>Liability for content</h2>
+  <p>
+    The content of this website has been created with the utmost care. However, we cannot guarantee that it is accurate, complete or up
+    to date. As a service provider, we are responsible for our own content on these pages in accordance with general law.
+  </p>
+
+  <h2>Liability for links</h2>
+  <p>
+    This website contains links to external third-party websites whose content we have no control over. The respective provider or
+    operator is always responsible for the content of linked pages. If we become aware of any legal violations, we will remove such
+    links immediately.
+  </p>
+
+  <h2>Copyright</h2>
+  <p>
+    The content and works published on this website are subject to German copyright law. Any reproduction, editing, distribution or use
+    beyond the limits of copyright law requires the written consent of {company.legalName}.
+  </p>
+</LegalPage>

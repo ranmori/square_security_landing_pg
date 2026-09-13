@@ -1,0 +1,72 @@
+---
+import LegalPage from '../components/pages/LegalPage.astro';
+import Placeholder from '../components/Placeholder.astro';
+import { company } from '../data/company';
+---
+
+<LegalPage lang="de" page="imprint" title="Impressum">
+  <h2>Angaben gemäß § 5 DDG</h2>
+  <p>
+    {company.legalName}<br />
+    {company.street}<br />
+    {company.postalCode} {company.city}
+  </p>
+
+  <h2>Vertreten durch</h2>
+  <p>Geschäftsführer: {company.ceo}</p>
+
+  <h2>Kontakt</h2>
+  <p>
+    Telefon: <a href={`tel:${company.phoneE164}`}>{company.phoneDisplay}</a><br />
+    E-Mail: <a href={`mailto:${company.email}`}>{company.email}</a>
+  </p>
+
+  <h2>Registereintrag</h2>
+  <p>
+    Eintragung im Handelsregister<br />
+    Registergericht: <Placeholder>Amtsgericht – bitte ergänzen</Placeholder><br />
+    Registernummer: <Placeholder>HRB – bitte ergänzen</Placeholder>
+  </p>
+
+  <h2>Umsatzsteuer-ID</h2>
+  <p>
+    Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:<br />
+    <Placeholder>DE – bitte ergänzen</Placeholder>
+  </p>
+
+  <h2>Erlaubnis nach § 34a GewO</h2>
+  <p>
+    Erlaubnis für das Bewachungsgewerbe nach § 34a Gewerbeordnung.<br />
+    Zuständige Aufsichtsbehörde: <Placeholder>Behörde und Anschrift – bitte ergänzen</Placeholder>
+  </p>
+
+  <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+  <p>
+    {company.ceo}<br />
+    {company.street}, {company.postalCode} {company.city}
+  </p>
+
+  <h2>Verbraucherstreitbeilegung</h2>
+  <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+
+  <h2>Haftung für Inhalte</h2>
+  <p>
+    Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
+    können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir für eigene Inhalte auf diesen Seiten nach den allgemeinen
+    Gesetzen verantwortlich.
+  </p>
+
+  <h2>Haftung für Links</h2>
+  <p>
+    Diese Website enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für diese fremden Inhalte ist
+    stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige
+    Links umgehend entfernen.
+  </p>
+
+  <h2>Urheberrecht</h2>
+  <p>
+    Die auf dieser Website veröffentlichten Inhalte und Werke unterliegen dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung,
+    Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung der
+    {company.legalName}.
+  </p>
+</LegalPage>

@@ -1,0 +1,52 @@
+---
+import Icon from './Icon.astro';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  lang: Lang;
+  title: string;
+  eyebrow?: string;
+  lead?: string;
+  crumbs?: Crumb[];
+}
+
+const { lang, title, eyebrow, lead, crumbs = [] } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section class="relative overflow-hidden border-b border-navy-100 bg-navy-50/60">
+  <div aria-hidden="true" class="hero-grid pointer-events-none absolute inset-0"></div>
+  <div class="container-page relative py-12 sm:py-16 lg:py-20">
+    {
+      crumbs.length > 0 && (
+        <nav aria-label={t.nav.breadcrumb} class="mb-8">
+          <ol class="flex flex-wrap items-center gap-1.5 text-sm text-navy-500">
+            {crumbs.map((crumb, index) => (
+              <li class="flex items-center gap-1.5">
+                {index > 0 && <Icon name="chevronRight" class="size-3.5 text-navy-300" />}
+                {crumb.href ? (
+                  <a href={crumb.href} class="hover:text-navy-900">
+                    {crumb.label}
+                  </a>
+                ) : (
+                  <span aria-current="page" class="text-navy-900">
+                    {crumb.label}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    {eyebrow && <p class="eyebrow mb-4">{eyebrow}</p>}
+    <h1 class="max-w-3xl text-4xl leading-tight font-extrabold sm:text-5xl">{title}</h1>
+    {lead && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-navy-500">{lead}</p>}
+    <slot />
+  </div>
+</section>

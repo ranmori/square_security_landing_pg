@@ -1,0 +1,14 @@
+---
+interface Props {
+  /** "light" = navy wordmark for light backgrounds, "dark" = original white wordmark. */
+  variant?: 'light' | 'dark';
+  class?: string;
+  alt?: string;
+}
+
+const { variant = 'light', class: className = 'h-11 w-auto', alt = 'Square Security' } = Astro.props;
+// TODO: replace with the SVG logo once the client provides it.
+const src = variant === 'light' ? '/brand/logo-light-bg.png' : '/brand/logo-dark-bg.png';
+---
+
+<img src={src} alt={alt} width="300" height="119" class={className} />

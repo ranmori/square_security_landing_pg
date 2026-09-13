@@ -1,0 +1,191 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { pagePath, useTranslations, type Lang } from '../i18n/ui';
+import { getServices } from '../lib/services';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const f = useTranslations(lang).contact.form;
+const services = await getServices(lang);
+const siteKey = PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+<form
+  id="contact-form"
+  class="space-y-5"
+  method="post"
+  data-msg-success={f.success}
+  data-msg-error={f.error}
+  data-msg-invalid={f.invalid}
+  data-msg-spam={f.spam}
+  data-msg-sending={f.sending}
+>
+  <input type="hidden" name="lang" value={lang} />
+
+  <!-- Honeypot: hidden from people, bots tend to fill it in -->
+  <div class="absolute -left-[9999px]" aria-hidden="true">
+    <label for="cf-website">Website</label>
+    <input id="cf-website" type="text" name="website" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="cf-name" class="field-label">{f.name} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input
+        id="cf-name"
+        name="name"
+        type="text"
+        required
+        minlength="2"
+        maxlength="120"
+        autocomplete="name"
+        class="field-input"
+        aria-describedby="cf-name-error"
+      />
+      <p id="cf-name-error" class="field-error" data-error-for="name" data-msg={f.errors.name} hidden></p>
+    </div>
+    <div>
+      <label for="cf-company" class="field-label">{f.company}</label>
+      <input id="cf-company" name="company" type="text" maxlength="160" autocomplete="organization" class="field-input" />
+    </div>
+    <div>
+      <label for="cf-email" class="field-label">{f.email} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input
+        id="cf-email"
+        name="email"
+        type="email"
+        required
+        maxlength="200"
+        autocomplete="email"
+        class="field-input"
+        aria-describedby="cf-email-error"
+      />
+      <p id="cf-email-error" class="field-error" data-error-for="email" data-msg={f.errors.email} hidden></p>
+    </div>
+    <div>
+      <label for="cf-phone" class="field-label">{f.phone}</label>
+      <input id="cf-phone" name="phone" type="tel" maxlength="60" autocomplete="tel" class="field-input" />
+    </div>
+  </div>
+
+  <div>
+    <label for="cf-service" class="field-label">{f.service}</label>
+    <select id="cf-service" name="service" class="field-input">
+      <option value="">{f.servicePlaceholder}</option>
+      {services.map((service) => <option value={service.data.key}>{service.data.navTitle}</option>)}
+      <option value="other">{f.serviceOther}</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="cf-message" class="field-label">{f.message} <span class="text-brand-700" aria-hidden="true">*</span></label>
+    <textarea
+      id="cf-message"
+      name="message"
+      rows="6"
+      required
+      minlength="10"
+      maxlength="5000"
+      class="field-input resize-y"
+      aria-describedby="cf-message-hint cf-message-error"></textarea>
+    <p id="cf-message-hint" class="mt-1.5 text-sm text-navy-500">{f.messageHint}</p>
+    <p id="cf-message-error" class="field-error" data-error-for="message" data-msg={f.errors.message} hidden></p>
+  </div>
+
+  <div>
+    <div class="flex gap-3">
+      <input
+        id="cf-privacy"
+        name="privacy"
+        type="checkbox"
+        required
+        class="mt-1 size-4 shrink-0 accent-navy-900"
+        aria-describedby="cf-privacy-error"
+      />
+      <label for="cf-privacy" class="text-sm leading-relaxed text-navy-600">
+        {f.privacyBefore}<a
+          href={pagePath('privacy', lang)}
+          target="_blank"
+          rel="noopener"
+          class="font-medium text-navy-900 underline decoration-brand-500 underline-offset-2">{f.privacyLink}</a
+        >{f.privacyAfter} <span class="text-brand-700" aria-hidden="true">*</span>
+      </label>
+    </div>
+    <p id="cf-privacy-error" class="field-error" data-error-for="privacy" data-msg={f.errors.privacy} hidden></p>
+  </div>
+
+  {siteKey && <div class="cf-turnstile" data-sitekey={siteKey} data-language={lang} data-theme="light" data-size="flexible"></div>}
+
+  <p class="text-xs text-navy-500">{f.requiredNote}</p>
+
+  <button type="submit" class="btn btn-primary btn-lg w-full sm:w-auto" data-label={f.submit}>{f.submit}</button>
+
+  <p id="cf-status" role="status" aria-live="polite" class="hidden rounded-lg px-4 py-3 text-sm"></p>
+</form>
+
+{siteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<script>
+  import { actions, isInputError } from 'astro:actions';
+
+  type TurnstileWindow = Window & { turnstile?: { reset: () => void } };
+
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+
+  if (form) {
+    const status = form.querySelector<HTMLParagraphElement>('#cf-status')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const messages = form.dataset;
+
+    const showStatus = (kind: 'success' | 'error', text: string) => {
+      status.textContent = text;
+      status.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+      status.classList.add(...(kind === 'success' ? ['bg-green-50', 'text-green-800'] : ['bg-red-50', 'text-red-800']));
+    };
+
+    const clearFieldErrors = () => {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((el) => {
+        el.hidden = true;
+        el.textContent = '';
+      });
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearFieldErrors();
+      status.classList.add('hidden');
+      submit.disabled = true;
+      submit.textContent = messages.msgSending ?? '';
+
+      try {
+        const { error } = await actions.contact(new FormData(form));
+        if (!error) {
+          form.reset();
+          showStatus('success', messages.msgSuccess ?? '');
+        } else if (isInputError(error)) {
+          for (const field of Object.keys(error.fields)) {
+            const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+            if (errorEl) {
+              errorEl.textContent = errorEl.dataset.msg ?? '';
+              errorEl.hidden = false;
+            }
+            form.querySelector(`[name="${field}"]`)?.setAttribute('aria-invalid', 'true');
+          }
+          showStatus('error', messages.msgInvalid ?? '');
+        } else {
+          showStatus('error', (error.code === 'FORBIDDEN' ? messages.msgSpam : messages.msgError) ?? '');
+        }
+      } catch {
+        showStatus('error', messages.msgError ?? '');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = submit.dataset.label ?? '';
+        (window as TurnstileWindow).turnstile?.reset();
+      }
+    });
+  }
+</script>

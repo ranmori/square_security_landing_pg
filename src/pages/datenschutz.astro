@@ -1,0 +1,95 @@
+---
+import LegalPage from '../components/pages/LegalPage.astro';
+import { company } from '../data/company';
+---
+
+<LegalPage lang="de" page="privacy" title="Datenschutzerklärung">
+  <h2>1. Verantwortlicher</h2>
+  <p>
+    {company.legalName}<br />
+    {company.street}, {company.postalCode} {company.city}<br />
+    Geschäftsführer: {company.ceo}<br />
+    Telefon: <a href={`tel:${company.phoneE164}`}>{company.phoneDisplay}</a><br />
+    E-Mail: <a href={`mailto:${company.email}`}>{company.email}</a>
+  </p>
+
+  <h2>2. Allgemeines</h2>
+  <p>
+    Wir verarbeiten personenbezogene Daten nur, soweit dies für eine funktionsfähige Website, unsere Inhalte und Leistungen
+    erforderlich ist. Rechtsgrundlagen sind insbesondere Art. 6 Abs. 1 lit. a (Einwilligung), lit. b (Vertrag und vorvertragliche
+    Maßnahmen), lit. c (rechtliche Verpflichtung) und lit. f (berechtigte Interessen) der Datenschutz-Grundverordnung (DSGVO).
+  </p>
+
+  <h2>3. Hosting und Bereitstellung der Website</h2>
+  <p>
+    Diese Website wird über Cloudflare, Inc. (USA) bereitgestellt. Beim Aufruf der Website verarbeitet Cloudflare technisch notwendige
+    Daten, insbesondere IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, Referrer sowie Browser und Betriebssystem. Dies
+    dient der sicheren, stabilen und schnellen Auslieferung der Website sowie der Abwehr von Angriffen. Rechtsgrundlage ist unser
+    berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO.
+  </p>
+  <p>
+    Mit Cloudflare besteht ein Vertrag zur Auftragsverarbeitung. Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert;
+    Datenübermittlungen in die USA erfolgen auf Grundlage des Angemessenheitsbeschlusses der EU-Kommission (Art. 45 DSGVO) sowie
+    ergänzend der EU-Standardvertragsklauseln. Weitere Informationen:
+    <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Datenschutzerklärung von Cloudflare</a>.
+  </p>
+
+  <h2>4. Cookies, Tracking und Schriftarten</h2>
+  <p>
+    Wir setzen keine Cookies zu Analyse- oder Werbezwecken ein und verwenden keine Tracking-Dienste. Alle Schriftarten werden lokal von
+    unserem Server geladen; es findet keine Verbindung zu Servern von Google oder anderen Schriftanbietern statt.
+  </p>
+
+  <h2>5. Kontaktformular</h2>
+  <p>
+    Wenn Sie uns über das Kontaktformular eine Anfrage senden, verarbeiten wir Ihre Angaben (Name, E-Mail-Adresse, Ihre Nachricht sowie
+    freiwillig Firma, Telefonnummer und gewünschte Leistung), um Ihre Anfrage zu bearbeiten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+    DSGVO, soweit Ihre Anfrage auf einen Vertrag abzielt, im Übrigen Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO und unser
+    berechtigtes Interesse an der Beantwortung von Anfragen nach Art. 6 Abs. 1 lit. f DSGVO.
+  </p>
+  <p>
+    Die Nachricht wird über den E-Mail-Dienst Resend (Resend, Inc., USA) an unser Postfach zugestellt. Resend verarbeitet die Daten in
+    unserem Auftrag auf Grundlage eines Vertrags zur Auftragsverarbeitung. Die Übermittlung in die USA erfolgt auf Grundlage geeigneter
+    Garantien, insbesondere der EU-Standardvertragsklauseln.
+  </p>
+  <p>
+    Wir löschen Ihre Daten, sobald Ihre Anfrage abschließend bearbeitet ist und keine gesetzlichen Aufbewahrungspflichten (z. B. nach
+    Handels- oder Steuerrecht) entgegenstehen. Ihre Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen, z. B. per
+    E-Mail an <a href={`mailto:${company.email}`}>{company.email}</a>.
+  </p>
+
+  <h2>6. Spamschutz mit Cloudflare Turnstile</h2>
+  <p>
+    Zum Schutz des Kontaktformulars vor Missbrauch durch automatisierte Programme nutzen wir Cloudflare Turnstile (Cloudflare, Inc.,
+    USA). Dabei werden technische Informationen wie IP-Adresse und Browsermerkmale an Cloudflare übermittelt, um zu prüfen, ob die
+    Eingabe von einem Menschen stammt. Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren Kontaktformular nach Art. 6
+    Abs. 1 lit. f DSGVO. Zur Datenübermittlung in die USA siehe Abschnitt 3.
+  </p>
+
+  <h2>7. Kontakt per E-Mail oder Telefon</h2>
+  <p>
+    Wenn Sie uns per E-Mail oder Telefon kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens. Rechtsgrundlage ist
+    Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO. Für die Löschung gilt Abschnitt 5 entsprechend.
+  </p>
+
+  <h2>8. Ihre Rechte</h2>
+  <p>Sie haben jederzeit das Recht auf:</p>
+  <ul>
+    <li>Auskunft über Ihre gespeicherten Daten (Art. 15 DSGVO)</li>
+    <li>Berichtigung unrichtiger Daten (Art. 16 DSGVO)</li>
+    <li>Löschung (Art. 17 DSGVO) und Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+    <li>Datenübertragbarkeit (Art. 20 DSGVO)</li>
+    <li>Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO)</li>
+    <li>Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)</li>
+  </ul>
+  <p>
+    Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO). Für uns zuständig ist das Bayerische
+    Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18, 91522 Ansbach.
+  </p>
+
+  <h2>9. Datensicherheit</h2>
+  <p>Diese Website nutzt eine TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie an „https://“ in der Adresszeile.</p>
+
+  <h2>10. Stand</h2>
+  <p>September 2026</p>
+</LegalPage>

@@ -1,0 +1,101 @@
+---
+import LegalPage from '../../components/pages/LegalPage.astro';
+import { company, phoneLabel } from '../../data/company';
+import { pagePath } from '../../i18n/ui';
+---
+
+<LegalPage lang="en" page="privacy" title="Privacy policy">
+  <p>
+    This is a translation for convenience. The <a href={pagePath('privacy', 'de')} lang="de">German version (Datenschutzerklärung)</a> is
+    legally binding.
+  </p>
+
+  <h2>1. Controller</h2>
+  <p>
+    {company.legalName}<br />
+    {company.street}, {company.postalCode} {company.city}, Germany<br />
+    Managing director: {company.ceo}<br />
+    Phone: <a href={`tel:${company.phoneE164}`}>{phoneLabel('en')}</a><br />
+    Email: <a href={`mailto:${company.email}`}>{company.email}</a>
+  </p>
+
+  <h2>2. General information</h2>
+  <p>
+    We only process personal data to the extent necessary to provide a functional website, our content and our services. The legal bases
+    are in particular Art. 6 (1) (a) (consent), (b) (contract and pre-contractual measures), (c) (legal obligation) and (f) (legitimate
+    interests) of the General Data Protection Regulation (GDPR).
+  </p>
+
+  <h2>3. Hosting and delivery of the website</h2>
+  <p>
+    This website is delivered via Cloudflare, Inc. (USA). When you visit the website, Cloudflare processes technically necessary data,
+    in particular your IP address, date and time of access, the page requested, referrer, browser and operating system. This serves the
+    secure, stable and fast delivery of the website and protection against attacks. The legal basis is our legitimate interest under
+    Art. 6 (1) (f) GDPR.
+  </p>
+  <p>
+    We have concluded a data processing agreement with Cloudflare. Cloudflare is certified under the EU-US Data Privacy Framework; data
+    transfers to the USA are based on the European Commission's adequacy decision (Art. 45 GDPR) and additionally on the EU Standard
+    Contractual Clauses. More information:
+    <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare privacy policy</a>.
+  </p>
+
+  <h2>4. Cookies, tracking and fonts</h2>
+  <p>
+    We do not use cookies for analytics or advertising and do not use any tracking services. All fonts are loaded locally from our
+    server; no connection is made to Google or other font providers.
+  </p>
+
+  <h2>5. Contact form</h2>
+  <p>
+    When you send us an enquiry via the contact form, we process your details (name, email address, your message and, optionally,
+    company, phone number and requested service) to handle your enquiry. The legal basis is Art. 6 (1) (b) GDPR where your enquiry
+    relates to a contract, and otherwise your consent under Art. 6 (1) (a) GDPR and our legitimate interest in answering enquiries under
+    Art. 6 (1) (f) GDPR.
+  </p>
+  <p>
+    Your message is delivered to our mailbox via the email service Resend (Resend, Inc., USA). Resend processes the data on our behalf
+    under a data processing agreement. Transfers to the USA are based on appropriate safeguards, in particular the EU Standard Contractual
+    Clauses.
+  </p>
+  <p>
+    We delete your data once your enquiry has been fully handled, unless statutory retention obligations (e.g. under commercial or tax
+    law) apply. You can withdraw your consent at any time with effect for the future, e.g. by email to
+    <a href={`mailto:${company.email}`}>{company.email}</a>.
+  </p>
+
+  <h2>6. Spam protection with Cloudflare Turnstile</h2>
+  <p>
+    To protect the contact form against abuse by automated programs, we use Cloudflare Turnstile (Cloudflare, Inc., USA). Technical
+    information such as your IP address and browser characteristics is transmitted to Cloudflare to check whether the input comes from a
+    human. The legal basis is our legitimate interest in a secure contact form under Art. 6 (1) (f) GDPR. For data transfers to the USA,
+    see section 3.
+  </p>
+
+  <h2>7. Contact by email or phone</h2>
+  <p>
+    If you contact us by email or phone, we process your details to handle your request. The legal basis is Art. 6 (1) (b) or (f) GDPR.
+    Section 5 applies accordingly to deletion.
+  </p>
+
+  <h2>8. Your rights</h2>
+  <p>You have the right at any time to:</p>
+  <ul>
+    <li>access your stored data (Art. 15 GDPR)</li>
+    <li>rectification of inaccurate data (Art. 16 GDPR)</li>
+    <li>erasure (Art. 17 GDPR) and restriction of processing (Art. 18 GDPR)</li>
+    <li>data portability (Art. 20 GDPR)</li>
+    <li>object to processing based on legitimate interests (Art. 21 GDPR)</li>
+    <li>withdraw consent with effect for the future (Art. 7 (3) GDPR)</li>
+  </ul>
+  <p>
+    You also have the right to lodge a complaint with a data protection supervisory authority (Art. 77 GDPR). The authority responsible
+    for us is the Bavarian State Office for Data Protection Supervision (BayLDA), Promenade 18, 91522 Ansbach, Germany.
+  </p>
+
+  <h2>9. Data security</h2>
+  <p>This website uses TLS encryption. You can recognise an encrypted connection by “https://” in the address bar.</p>
+
+  <h2>10. Last updated</h2>
+  <p>September 2026</p>
+</LegalPage>

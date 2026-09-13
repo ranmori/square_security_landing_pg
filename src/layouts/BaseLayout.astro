@@ -1,0 +1,106 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/manrope';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { company, phoneLabel } from '../data/company';
+import { useTranslations, type Alternates, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** Paths of this page in every language; null for pages without translations (404). */
+  alternates: Alternates | null;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { lang, title, description, alternates, noindex = false, jsonLd = [] } = Astro.props;
+const t = useTranslations(lang);
+const site = Astro.site ?? new URL('https://square-security.de');
+const fullTitle = title ? `${title} | ${t.meta.brandName}` : t.meta.defaultTitle;
+const metaDescription = description ?? t.meta.defaultDescription;
+const canonical = new URL(alternates?.[lang] ?? Astro.url.pathname, site).href;
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': `${site.origin}/#organization`,
+  name: company.legalName,
+  url: site.origin,
+  logo: new URL('/brand/logo-light-bg.png', site).href,
+  telephone: company.phoneE164,
+  email: company.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: company.street,
+    postalCode: company.postalCode,
+    addressLocality: company.city,
+    addressRegion: company.region,
+    addressCountry: company.country,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '18:00',
+    },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '09:00', closes: '16:00' },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={metaDescription} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      alternates && (
+        <>
+          <link rel="alternate" hreflang="de" href={new URL(alternates.de, site).href} />
+          <link rel="alternate" hreflang="en" href={new URL(alternates.en, site).href} />
+          <link rel="alternate" hreflang="x-default" href={new URL(alternates.de, site).href} />
+        </>
+      )
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={company.legalName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={t.meta.ogLocale} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/png" href="/brand/favicon.png" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify([organization, ...jsonLd])}></script>
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-navy-900 focus:px-4 focus:py-2 focus:text-white"
+      >{t.nav.skipToContent}</a
+    >
+    <Header lang={lang} alternates={alternates} />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <a
+      href={`tel:${company.phoneE164}`}
+      class="fixed right-4 bottom-4 z-30 grid size-14 place-items-center rounded-full bg-brand-500 text-navy-900 shadow-lg shadow-navy-900/25 sm:hidden"
+      aria-label={`${t.nav.call}: ${phoneLabel(lang)}`}
+    >
+      <Icon name="phone" class="size-6" />
+    </a>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../PageHero.astro';
+import { company } from '../../data/company';
+import { pageAlternates, pagePath, useTranslations, type Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  page: 'imprint' | 'privacy';
+  title: string;
+}
+
+const { lang, page, title } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} title={title} description={`${title} – ${company.legalName}`} alternates={pageAlternates(page)}>
+  <PageHero lang={lang} title={title} crumbs={[{ label: t.nav.home, href: pagePath('home', lang) }, { label: title }]} />
+  <section class="section">
+    <div class="container-page">
+      <div class="prose-content max-w-3xl">
+        <slot />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

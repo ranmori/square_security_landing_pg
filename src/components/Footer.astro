@@ -1,0 +1,89 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { company, phoneLabel } from '../data/company';
+import { pagePath, servicePath, useTranslations, type Lang } from '../i18n/ui';
+import { getServices } from '../lib/services';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const services = await getServices(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-navy-900 text-navy-200">
+  <div class="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:py-16">
+    <div>
+      <Logo variant="dark" class="h-12 w-auto" />
+      <p class="mt-5 max-w-xs text-sm leading-relaxed">{t.footer.tagline}</p>
+    </div>
+
+    <div>
+      <h2 class="footer-title">{t.footer.servicesTitle}</h2>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        {
+          services.map((service) => (
+            <li>
+              <a href={servicePath(service.data.key, lang)} class="footer-link">
+                {service.data.navTitle}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer-title">{t.footer.companyTitle}</h2>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        <li><a href={pagePath('home', lang)} class="footer-link">{t.nav.home}</a></li>
+        <li><a href={pagePath('services', lang)} class="footer-link">{t.nav.services}</a></li>
+        <li><a href={pagePath('contact', lang)} class="footer-link">{t.nav.contact}</a></li>
+        <li><a href={pagePath('imprint', lang)} class="footer-link">{t.footer.imprint}</a></li>
+        <li><a href={pagePath('privacy', lang)} class="footer-link">{t.footer.privacy}</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer-title">{t.footer.contactTitle}</h2>
+      <address class="mt-4 space-y-3 text-sm not-italic">
+        <p class="flex gap-3">
+          <Icon name="mapPin" class="mt-0.5 size-4 shrink-0 text-brand-500" />
+          <span>{company.street}<br />{company.postalCode} {company.city}</span>
+        </p>
+        <p class="flex gap-3">
+          <Icon name="phone" class="mt-0.5 size-4 shrink-0 text-brand-500" />
+          <a href={`tel:${company.phoneE164}`} class="footer-link">{phoneLabel(lang)}</a>
+        </p>
+        <p class="flex gap-3">
+          <Icon name="mail" class="mt-0.5 size-4 shrink-0 text-brand-500" />
+          <a href={`mailto:${company.email}`} class="footer-link">{company.email}</a>
+        </p>
+      </address>
+      <dl class="mt-5 space-y-1 text-sm">
+        {
+          t.hours.map((entry) => (
+            <div class="flex justify-between gap-4">
+              <dt>{entry.days}</dt>
+              <dd class="text-white">{entry.time}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-page flex flex-col gap-3 py-6 text-xs text-navy-300 sm:flex-row sm:items-center sm:justify-between">
+      <p>© {year} {company.legalName}. {t.footer.rights}</p>
+      <ul class="flex gap-5">
+        <li><a href={pagePath('imprint', lang)} class="footer-link">{t.footer.imprint}</a></li>
+        <li><a href={pagePath('privacy', lang)} class="footer-link">{t.footer.privacy}</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

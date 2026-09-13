@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../PageHero.astro';
+import ServiceCard from '../ServiceCard.astro';
+import CustomServiceCard from '../CustomServiceCard.astro';
+import CtaBand from '../CtaBand.astro';
+import { pageAlternates, pagePath, useTranslations, type Lang } from '../../i18n/ui';
+import { getServices } from '../../lib/services';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const services = await getServices(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={t.services.metaTitle}
+  description={t.services.metaDescription}
+  alternates={pageAlternates('services')}
+>
+  <PageHero
+    lang={lang}
+    eyebrow={t.services.eyebrow}
+    title={t.services.title}
+    lead={t.services.lead}
+    crumbs={[{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.services }]}
+  />
+
+  <section class="section">
+    <div class="container-page grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => <ServiceCard service={service} lang={lang} headingLevel="h2" />)}
+      <CustomServiceCard lang={lang} headingLevel="h2" />
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>
