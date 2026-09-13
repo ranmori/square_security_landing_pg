@@ -98,6 +98,7 @@ const organization = {
     <a
       href={`tel:${company.phoneE164}`}
       class="fixed right-4 bottom-4 z-30 grid size-14 place-items-center rounded-full bg-brand-500 text-navy-900 shadow-lg shadow-navy-900/25 sm:hidden"
+      style="view-transition-name: call-button"
       aria-label={`${t.nav.call}: ${phoneLabel(lang)}`}
     >
       <Icon name="phone" class="size-6" />

@@ -25,7 +25,10 @@ const isContact = path === contactHref;
 const phone = phoneLabel(lang);
 ---
 
-<header class="sticky top-0 z-40 border-b border-navy-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+<header
+  class="sticky top-0 z-40 border-b border-navy-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85"
+  style="view-transition-name: site-header"
+>
   <div class="container-page flex h-18 items-center justify-between gap-6">
     <a href={pagePath('home', lang)} class="shrink-0">
       <Logo class="h-10 w-auto sm:h-11" alt={`Square Security – ${t.nav.home}`} />

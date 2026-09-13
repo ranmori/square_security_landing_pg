@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
-import { useTranslations, type Lang } from '../i18n/ui';
+import type { IconName } from './icons';
+import { useTranslations, type Lang, type ServiceKey } from '../i18n/ui';
 
 interface Crumb {
   label: string;
@@ -13,10 +14,17 @@ interface Props {
   eyebrow?: string;
   lead?: string;
   crumbs?: Crumb[];
+  icon?: IconName;
+  /** Service key; matches the ServiceCard transition names so icon and title morph between pages. */
+  transitionKey?: ServiceKey;
 }
 
-const { lang, title, eyebrow, lead, crumbs = [] } = Astro.props;
+const { lang, title, eyebrow, lead, crumbs = [], icon, transitionKey } = Astro.props;
 const t = useTranslations(lang);
+const iconTransition = transitionKey ? `view-transition-name: service-icon-${transitionKey}` : undefined;
+const titleTransition = transitionKey
+  ? `view-transition-name: service-title-${transitionKey}; view-transition-class: service-title`
+  : undefined;
 ---
 
 <section class="relative overflow-hidden border-b border-navy-100 bg-navy-50/60">
@@ -44,8 +52,15 @@ const t = useTranslations(lang);
         </nav>
       )
     }
+    {
+      icon && (
+        <span class="mb-6 grid size-14 place-items-center rounded-2xl bg-navy-900 text-brand-500" style={iconTransition}>
+          <Icon name={icon} class="size-7" />
+        </span>
+      )
+    }
     {eyebrow && <p class="eyebrow mb-4">{eyebrow}</p>}
-    <h1 class="max-w-3xl text-4xl leading-tight font-extrabold sm:text-5xl">{title}</h1>
+    <h1 class="w-fit max-w-3xl text-4xl leading-tight font-extrabold sm:text-5xl" style={titleTransition}>{title}</h1>
     {lead && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-navy-500">{lead}</p>}
     <slot />
   </div>

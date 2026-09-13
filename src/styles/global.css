@@ -29,6 +29,54 @@
   --font-display: "Manrope Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
+/*
+ * Page morph transitions (cross-document View Transitions).
+ * Browsers without support simply navigate normally.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+::view-transition-group(*) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+::view-transition-old(root) {
+  animation: 200ms ease-out both vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 300ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms both vt-fade-in;
+}
+
+/* Card title and page H1 differ in size: crossfade the text instead of stretching it. */
+::view-transition-old(.service-title),
+::view-transition-new(.service-title) {
+  height: 100%;
+  object-fit: none;
+  object-position: left center;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

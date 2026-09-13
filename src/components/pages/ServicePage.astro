@@ -5,6 +5,7 @@ import PageHero from '../PageHero.astro';
 import Icon from '../Icon.astro';
 import ServiceCard from '../ServiceCard.astro';
 import CtaBand from '../CtaBand.astro';
+import { serviceIcons } from '../icons';
 import { company, phoneLabel } from '../../data/company';
 import { pagePath, serviceAlternates, useTranslations, type Lang } from '../../i18n/ui';
 import { getServices, type ServiceEntry } from '../../lib/services';
@@ -48,6 +49,8 @@ const faqSchema =
     lang={lang}
     eyebrow={t.services.eyebrow}
     title={data.title}
+    icon={serviceIcons[data.key]}
+    transitionKey={data.key}
     lead={data.summary}
     crumbs={[
       { label: t.nav.home, href: pagePath('home', lang) },

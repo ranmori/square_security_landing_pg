@@ -20,10 +20,16 @@ const t = useTranslations(lang);
 >
   <span
     class="grid size-12 place-items-center rounded-xl bg-navy-900 text-brand-500 transition group-hover:bg-brand-500 group-hover:text-navy-900"
+    style={`view-transition-name: service-icon-${service.data.key}`}
   >
     <Icon name={serviceIcons[service.data.key]} class="size-6" />
   </span>
-  <Heading class="mt-5 text-lg font-bold">{service.data.navTitle}</Heading>
+  <Heading
+    class="mt-5 w-fit text-lg font-bold"
+    style={`view-transition-name: service-title-${service.data.key}; view-transition-class: service-title`}
+  >
+    {service.data.navTitle}
+  </Heading>
   <p class="mt-2 flex-1 text-sm leading-relaxed text-navy-500">{service.data.summary}</p>
   <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900">
     {t.services.learnMore}
