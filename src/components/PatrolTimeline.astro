@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import GuardFigure from './illustrations/GuardFigure.astro';
 
 interface Props {
   steps: { title: string; text: string }[];
@@ -8,36 +9,70 @@ interface Props {
 const { steps } = Astro.props;
 ---
 
-<ol class="patrol grid gap-5 md:grid-cols-3" data-patrol>
-  {
-    steps.map((step, index) => (
-      <li class="patrol-step relative flex gap-5 md:flex-col md:items-center md:gap-0 md:text-center" data-step>
-        {index < steps.length - 1 && (
-          <span class="patrol-segment" aria-hidden="true">
-            <span class="patrol-fill" />
+<div class="patrol relative" data-patrol>
+  <div class="patrol-guard" aria-hidden="true">
+    <svg viewBox="0 0 120 200" overflow="visible" class="block h-full w-full">
+      <ellipse cx="62" cy="194" rx="26" ry="4" fill="#0E182D" opacity="0.18"></ellipse>
+      <GuardFigure />
+    </svg>
+  </div>
+
+  <ol class="grid gap-5 md:grid-cols-3">
+    {
+      steps.map((step, index) => (
+        <li class="patrol-step relative flex gap-5 md:flex-col md:items-center md:gap-0 md:text-center" data-step>
+          {index < steps.length - 1 && (
+            <span class="patrol-segment" aria-hidden="true">
+              <span class="patrol-fill" />
+            </span>
+          )}
+          <span
+            class="patrol-marker relative z-10 grid size-12 shrink-0 place-items-center rounded-full font-display text-sm font-extrabold"
+            aria-hidden="true"
+          >
+            <span class="patrol-number">{String(index + 1).padStart(2, '0')}</span>
+            <span class="patrol-check absolute inset-0 grid place-items-center">
+              <Icon name="check" class="size-5" strokeWidth={2.5} />
+            </span>
           </span>
-        )}
-        <span
-          class="patrol-marker relative z-10 grid size-12 shrink-0 place-items-center rounded-full font-display text-sm font-extrabold"
-          aria-hidden="true"
-        >
-          <span class="patrol-number">{String(index + 1).padStart(2, '0')}</span>
-          <span class="patrol-check absolute inset-0 grid place-items-center">
-            <Icon name="check" class="size-5" strokeWidth={2.5} />
-          </span>
-        </span>
-        <div class="patrol-card w-full flex-1 rounded-2xl border bg-white p-6 sm:p-8 md:mt-6">
-          <h3 class="text-xl font-bold">{step.title}</h3>
-          <p class="mt-2 leading-relaxed text-navy-500">{step.text}</p>
-        </div>
-      </li>
-    ))
-  }
-</ol>
+          <div class="patrol-card w-full flex-1 rounded-2xl border bg-white p-6 sm:p-8 md:mt-6">
+            <h3 class="text-xl font-bold">{step.title}</h3>
+            <p class="mt-2 leading-relaxed text-navy-500">{step.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</div>
 
 <style>
   .patrol {
     --patrol-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Walking guard – only while the script drives the timeline */
+  .patrol-guard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    display: none;
+    width: 38px;
+    height: 63px;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .patrol.is-animated .patrol-guard {
+    display: block;
+  }
+
+  .patrol-guard svg {
+    transition: transform 250ms var(--patrol-ease);
+  }
+
+  .patrol-guard[data-dir='back'] svg {
+    transform: scaleX(-1);
   }
 
   /* Line segment from this checkpoint to the next one: vertical on mobile, horizontal from md. */
@@ -61,6 +96,11 @@ const { steps } = Astro.props;
   }
 
   @media (min-width: 48rem) {
+    .patrol-guard {
+      width: 56px;
+      height: 93px;
+    }
+
     .patrol-segment {
       top: calc(1.5rem - 1px);
       left: 50%;
@@ -179,27 +219,63 @@ const { steps } = Astro.props;
 <script>
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  document.querySelectorAll<HTMLElement>('[data-patrol]').forEach((list) => {
-    const steps = Array.from(list.querySelectorAll<HTMLElement>('[data-step]'));
-    // Without animation the timeline keeps its fully drawn default state.
-    if (reduceMotion || steps.length < 2) return;
+  document.querySelectorAll<HTMLElement>('[data-patrol]').forEach((root) => {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
+    const markers = steps.map((step) => step.querySelector<HTMLElement>('.patrol-marker'));
+    const guard = root.querySelector<HTMLElement>('.patrol-guard');
+    // Without animation the timeline keeps its fully drawn default state and the guard stays hidden.
+    if (reduceMotion || steps.length < 2 || !guard || markers.some((marker) => !marker)) return;
 
-    list.classList.add('is-animated');
+    root.classList.add('is-animated');
     const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
+    const last = steps.length - 1;
     let frame = 0;
+    let previousPos = -1;
+    let stopTimer = 0;
+
+    // Marker position relative to the root, unaffected by the markers' pop transform.
+    const markerPoint = (index: number) => {
+      const step = steps[index];
+      const marker = markers[index]!;
+      return {
+        x: step.offsetLeft + marker.offsetLeft + marker.offsetWidth / 2,
+        top: step.offsetTop + marker.offsetTop,
+      };
+    };
 
     const update = () => {
       frame = 0;
-      const rect = list.getBoundingClientRect();
+      const rect = root.getBoundingClientRect();
       const vh = window.innerHeight;
       const span = Math.max(rect.height * 0.6, vh * 0.45);
       const progress = clamp((vh * 0.75 - rect.top) / span);
-      const scaled = progress * (steps.length - 1);
+
+      // The guard only moves in the middle of each segment, so it pauses briefly at every checkpoint.
+      const raw = progress * last;
+      const segment = Math.min(Math.floor(raw), last - 1);
+      const pos = segment + clamp((raw - segment - 0.08) / 0.84);
 
       steps.forEach((step, index) => {
-        step.style.setProperty('--fill', String(clamp(scaled - index)));
-        step.toggleAttribute('data-reached', progress > 0 && scaled >= index);
+        step.style.setProperty('--fill', String(clamp(pos - index)));
+        step.toggleAttribute('data-reached', progress > 0 && pos >= index);
       });
+
+      const from = Math.min(Math.floor(pos), last - 1);
+      const t = pos - from;
+      const a = markerPoint(from);
+      const b = markerPoint(from + 1);
+      const x = a.x + (b.x - a.x) * t;
+      const top = a.top + (b.top - a.top) * t;
+      guard.style.transform = `translate(${x - guard.offsetWidth / 2}px, ${top - guard.offsetHeight + 4}px)`;
+
+      if (previousPos >= 0 && Math.abs(pos - previousPos) > 0.0005) {
+        guard.dataset.dir = pos < previousPos ? 'back' : 'forward';
+        guard.classList.add('guard-walking');
+        window.clearTimeout(stopTimer);
+        stopTimer = window.setTimeout(() => guard.classList.remove('guard-walking'), 180);
+      }
+      guard.classList.toggle('guard-checking', progress > 0 && Math.abs(pos - Math.round(pos)) < 0.001);
+      previousPos = pos;
     };
 
     const schedule = () => {

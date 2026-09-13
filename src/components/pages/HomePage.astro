@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Logo from '../Logo.astro';
+import GuardScene from '../illustrations/GuardScene.astro';
 import Icon from '../Icon.astro';
 import ServiceCard from '../ServiceCard.astro';
 import CustomServiceCard from '../CustomServiceCard.astro';
@@ -48,29 +48,27 @@ const whyIcons: IconName[] = ['chat', 'userCheck', 'sliders', 'clipboard'];
       </div>
 
       <div class="lg:col-span-5">
-        <div class="relative overflow-hidden rounded-3xl bg-navy-900 p-8 shadow-2xl shadow-navy-900/20 sm:p-10">
-          <div aria-hidden="true" class="pointer-events-none absolute -right-20 -bottom-20 size-64 rounded-full bg-brand-500/15 blur-3xl">
+        <div class="relative overflow-hidden rounded-3xl bg-navy-900 shadow-2xl shadow-navy-900/20">
+          <GuardScene lang={lang} />
+          <div
+            class="absolute inset-x-3 bottom-3 rounded-2xl border border-white/10 bg-navy-950/75 p-4 backdrop-blur-sm sm:inset-x-4 sm:bottom-4"
+          >
+            <p class="font-display text-sm font-semibold text-white">{h.heroCardTitle}</p>
+            <ul class="mt-2 grid gap-1 text-xs text-navy-200">
+              <li class="flex items-center gap-2">
+                <Icon name="mapPin" class="size-4 shrink-0 text-brand-500" />
+                {company.street}, {company.postalCode} {company.city}
+              </li>
+              <li class="flex items-center gap-2">
+                <Icon name="clock" class="size-4 shrink-0 text-brand-500" />
+                {t.hours[0].days}: {t.hours[0].time}
+              </li>
+              <li class="flex items-center gap-2">
+                <Icon name="mail" class="size-4 shrink-0 text-brand-500" />
+                <a href={`mailto:${company.email}`} class="hover:text-white">{company.email}</a>
+              </li>
+            </ul>
           </div>
-          <Logo variant="dark" class="relative h-auto w-full max-w-52" />
-          <p class="relative mt-8 font-display text-lg font-semibold text-white">{h.heroCardTitle}</p>
-          <ul class="relative mt-5 space-y-3 text-sm text-navy-200">
-            <li class="flex gap-3">
-              <Icon name="mapPin" class="size-5 shrink-0 text-brand-500" />
-              {company.street}, {company.postalCode} {company.city}
-            </li>
-            {
-              t.hours.slice(0, 2).map((entry) => (
-                <li class="flex gap-3">
-                  <Icon name="clock" class="size-5 shrink-0 text-brand-500" />
-                  {entry.days}: {entry.time}
-                </li>
-              ))
-            }
-            <li class="flex gap-3">
-              <Icon name="mail" class="size-5 shrink-0 text-brand-500" />
-              <a href={`mailto:${company.email}`} class="hover:text-white">{company.email}</a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
@@ -163,7 +161,7 @@ const whyIcons: IconName[] = ['chat', 'userCheck', 'sliders', 'clipboard'];
         <p class="eyebrow">{h.processEyebrow}</p>
         <h2 class="section-title">{h.processTitle}</h2>
       </div>
-      <div class="mt-12">
+      <div class="mt-16 md:mt-24">
         <PatrolTimeline steps={h.process} />
       </div>
     </div>

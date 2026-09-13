@@ -1,0 +1,293 @@
+---
+/**
+ * Flat geometric security officer, facing right, in a 120×200 coordinate space (feet at y≈192).
+ * Renders only a <g>; the parent provides the <svg>. Motion is switched on by ancestor classes:
+ * .guard-walking (walk cycle), .guard-checking (raises flashlight), .guard-idle-scene (breathing + beam sweep).
+ */
+interface Props {
+  /** Draw the flashlight light cone. Use at most once per page (gradient id). */
+  beam?: boolean;
+}
+
+const { beam = false } = Astro.props;
+
+const c = {
+  skin: '#C68B64',
+  skinShade: '#A9714F',
+  hair: '#2B1D16',
+  cap: '#0E182D',
+  brim: '#080E1C',
+  orange: '#F7981D',
+  shirt: '#2F4272',
+  shirtShade: '#223257',
+  sleeve: '#3A5088',
+  trousers: '#26375E',
+  trousersBack: '#1A2746',
+  shoe: '#1B2233',
+  dark: '#070C18',
+  buckle: '#C5CDDC',
+  flashlightHead: '#1C2A4A',
+};
+---
+
+<g class="guard">
+  {
+    beam && (
+      <defs>
+        <linearGradient id="guard-beam-gradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color={c.orange} stop-opacity="0.55" />
+          <stop offset="1" stop-color={c.orange} stop-opacity="0" />
+        </linearGradient>
+      </defs>
+    )
+  }
+
+  <g class="g-arm-back">
+    <path
+      d="M47 57 C41 58 39 63 39 69 L38.5 100 C38.5 103 40.5 105 43 105 C45.5 105 47.5 103 47.5 100 L50 65 Z"
+      fill={c.shirtShade}></path>
+    <circle cx="43" cy="106" r="4.6" fill={c.skinShade}></circle>
+  </g>
+
+  <g class="g-leg-back">
+    <path d="M50 110 H63 L62 186 H51 Z" fill={c.trousersBack}></path>
+    <path d="M50 184 H62 C68 184.5 71 187.5 71 192 H49 C48.5 188 49 185.5 50 184 Z" fill={c.shoe}></path>
+  </g>
+
+  <g class="g-leg-front">
+    <path d="M62.5 110 H77 L75.5 186 H63.5 Z" fill={c.trousers}></path>
+    <path d="M63 184 H75 C82 184.5 85 187.5 85 192 H62 C61.5 188 62 185.5 63 184 Z" fill={c.shoe}></path>
+  </g>
+
+  <g class="g-body">
+    <!-- torso -->
+    <path d="M45 64 C45 56 51 53 57 53 L70 53 C77 53 81 57 81 64 L79 112 L47 112 Z" fill={c.shirt}></path>
+    <path d="M45 64 C45 56 51 53 57 53 L55 112 L47 112 Z" fill={c.shirtShade}></path>
+    <path d="M57 53 L63 61 L69 53 L66.5 53 L63 57.5 L59.5 53 Z" fill={c.sleeve}></path>
+    <rect x="66" y="82" width="11" height="1.6" fill={c.shirtShade}></rect>
+    <!-- lion shield badge -->
+    <path d="M67 67 H76 V72 C76 76 73.5 78.5 71.5 79.5 C69.5 78.5 67 76 67 72 Z" fill={c.orange}></path>
+    <path
+      d="M69.2 69 H73.8 V72.2 C73.8 74.3 72.6 75.8 71.5 76.5 C70.4 75.8 69.2 74.3 69.2 72.2 Z"
+      fill={c.cap}></path>
+    <!-- belt -->
+    <rect x="46" y="106" width="34" height="7" rx="1" fill={c.dark}></rect>
+    <rect x="61" y="107.5" width="6" height="4" rx="0.8" fill={c.buckle}></rect>
+    <!-- shoulder radio -->
+    <g class="g-radio">
+      <rect x="50.5" y="55" width="1.8" height="8" rx="0.9" fill={c.dark}></rect>
+      <rect x="49" y="61" width="7" height="11" rx="1.8" fill={c.dark}></rect>
+      <circle class="g-led" cx="52.5" cy="64" r="1.3" fill={c.orange}></circle>
+    </g>
+    <!-- head -->
+    <rect x="58" y="45" width="10" height="10" fill={c.skinShade}></rect>
+    <circle cx="63" cy="35" r="13" fill={c.skin}></circle>
+    <path d="M50.5 33 C50 41 52.5 46 57 48.5 L58 33 Z" fill={c.hair}></path>
+    <circle cx="57.5" cy="37" r="2.8" fill={c.skinShade}></circle>
+    <!-- cap -->
+    <path d="M49 32 C49 18 57 13 64 13 C72 13 78 18 78.5 28 L78.5 32 Z" fill={c.cap}></path>
+    <rect x="49" y="27.5" width="29.5" height="4.5" fill={c.orange}></rect>
+    <path d="M76 29 L91 31 C93 32 92 35.5 89 35.5 L76 34 Z" fill={c.brim}></path>
+    <circle cx="66" cy="21" r="2.4" fill={c.orange}></circle>
+  </g>
+
+  <g class="g-arm-front">
+    <path
+      d="M71 55 C78 54 83 58 83.5 65 L84.5 88 C84.5 92 81.5 94.5 78 94.5 C74.5 94.5 72 92 72 88 L70.5 62 Z"
+      fill={c.sleeve}></path>
+    <path
+      d="M75 88.5 C77 85 81 84.5 84 86.5 L97 94 C99.5 95.5 100 98.5 98.5 100.5 C97 102.5 94 103 91.5 101.5 L78 94.5 C75 93 74 91 75 88.5 Z"
+      fill={c.sleeve}></path>
+    <g transform="rotate(28 96.5 98.5)">
+      {beam && <path class="g-beam" d="M114.5 98.5 L205 70 C212 90 212 108 205 127 Z" fill="url(#guard-beam-gradient)" />}
+      <rect x="93" y="95" width="17" height="7" rx="2" fill={c.dark}></rect>
+      <rect x="108.5" y="93.8" width="5" height="9.4" rx="1.6" fill={c.flashlightHead}></rect>
+      <rect x="112.5" y="94.5" width="2.2" height="8" rx="1" fill={c.orange}></rect>
+      <circle class="g-glow" cx="115" cy="98.5" r="7" fill={c.orange}></circle>
+    </g>
+    <circle cx="96.5" cy="98.5" r="4.8" fill={c.skin}></circle>
+  </g>
+</g>
+
+<style>
+  .g-arm-back,
+  .g-arm-front,
+  .g-leg-back,
+  .g-leg-front,
+  .g-body,
+  .g-beam {
+    transform-box: view-box;
+  }
+
+  .g-arm-back {
+    transform-origin: 45px 59px;
+  }
+
+  .g-arm-front {
+    transform-origin: 77px 57px;
+    transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .g-leg-back {
+    transform-origin: 56.5px 110px;
+  }
+
+  .g-leg-front {
+    transform-origin: 69.5px 110px;
+  }
+
+  .g-beam {
+    transform-origin: 114.5px 98.5px;
+  }
+
+  .g-glow {
+    opacity: 0;
+  }
+
+  /* Walk cycle */
+  :global(.guard-walking) .g-leg-front {
+    animation: guard-leg 650ms ease-in-out infinite;
+  }
+
+  :global(.guard-walking) .g-leg-back {
+    animation: guard-leg 650ms ease-in-out -325ms infinite;
+  }
+
+  :global(.guard-walking) .g-arm-front {
+    animation: guard-arm 650ms ease-in-out infinite;
+  }
+
+  :global(.guard-walking) .g-arm-back {
+    animation: guard-arm 650ms ease-in-out -325ms infinite;
+  }
+
+  :global(.guard-walking) .g-body {
+    animation: guard-bob 325ms ease-in-out infinite alternate;
+  }
+
+  /* Checkpoint: raise the flashlight and flash it once */
+  :global(.guard-checking) .g-arm-front {
+    transform: rotate(-35deg);
+  }
+
+  :global(.guard-checking) .g-glow {
+    animation: guard-flash 800ms ease-out 250ms;
+  }
+
+  :global(.guard-checking) .g-led,
+  :global(.guard-idle-scene) .g-led {
+    animation: guard-led 1.6s steps(1) infinite;
+  }
+
+  /* Idle in the hero scene */
+  :global(.guard-idle-scene) .g-body {
+    animation: guard-breathe 4s ease-in-out infinite alternate;
+  }
+
+  :global(.guard-idle-scene) .g-arm-front {
+    animation: guard-sweep 6s ease-in-out infinite alternate;
+  }
+
+  :global(.guard-idle-scene) .g-beam {
+    animation: guard-beam 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes guard-leg {
+    0%,
+    100% {
+      transform: rotate(20deg);
+    }
+
+    50% {
+      transform: rotate(-20deg);
+    }
+  }
+
+  @keyframes guard-arm {
+    0%,
+    100% {
+      transform: rotate(-14deg);
+    }
+
+    50% {
+      transform: rotate(14deg);
+    }
+  }
+
+  @keyframes guard-bob {
+    to {
+      transform: translateY(-2px);
+    }
+  }
+
+  @keyframes guard-breathe {
+    to {
+      transform: translateY(-1.5px);
+    }
+  }
+
+  @keyframes guard-sweep {
+    from {
+      transform: rotate(-6deg);
+    }
+
+    to {
+      transform: rotate(6deg);
+    }
+  }
+
+  @keyframes guard-beam {
+    from {
+      opacity: 0.8;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes guard-flash {
+    0% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+
+    30% {
+      opacity: 0.9;
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.8);
+    }
+  }
+
+  @keyframes guard-led {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  .g-glow {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .g-arm-back,
+    .g-arm-front,
+    .g-leg-back,
+    .g-leg-front,
+    .g-body,
+    .g-beam,
+    .g-glow,
+    .g-led {
+      animation: none !important;
+    }
+  }
+</style>

@@ -29,6 +29,7 @@ export const en: Dict = {
     secondaryCta: 'Our services',
     callHint: 'Or call us directly:',
     heroCardTitle: 'Your security partner in Lower Franconia',
+    illustrationAlt: 'Illustration: security officer with a flashlight on a night patrol',
     trust: [
       { title: 'Certified', text: 'Certified security service provider' },
       { title: 'Experienced', text: 'Operating since 2020 – from accommodation facilities to festivals' },
