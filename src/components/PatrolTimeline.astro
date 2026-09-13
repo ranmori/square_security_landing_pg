@@ -1,0 +1,213 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  steps: { title: string; text: string }[];
+}
+
+const { steps } = Astro.props;
+---
+
+<ol class="patrol grid gap-5 md:grid-cols-3" data-patrol>
+  {
+    steps.map((step, index) => (
+      <li class="patrol-step relative flex gap-5 md:flex-col md:items-center md:gap-0 md:text-center" data-step>
+        {index < steps.length - 1 && (
+          <span class="patrol-segment" aria-hidden="true">
+            <span class="patrol-fill" />
+          </span>
+        )}
+        <span
+          class="patrol-marker relative z-10 grid size-12 shrink-0 place-items-center rounded-full font-display text-sm font-extrabold"
+          aria-hidden="true"
+        >
+          <span class="patrol-number">{String(index + 1).padStart(2, '0')}</span>
+          <span class="patrol-check absolute inset-0 grid place-items-center">
+            <Icon name="check" class="size-5" strokeWidth={2.5} />
+          </span>
+        </span>
+        <div class="patrol-card w-full flex-1 rounded-2xl border bg-white p-6 sm:p-8 md:mt-6">
+          <h3 class="text-xl font-bold">{step.title}</h3>
+          <p class="mt-2 leading-relaxed text-navy-500">{step.text}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .patrol {
+    --patrol-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Line segment from this checkpoint to the next one: vertical on mobile, horizontal from md. */
+  .patrol-segment {
+    position: absolute;
+    top: 1.5rem;
+    left: calc(1.5rem - 1px);
+    width: 2px;
+    height: calc(100% + 1.25rem);
+    background-image: linear-gradient(to bottom, var(--color-navy-200) 50%, transparent 50%);
+    background-size: 2px 10px;
+  }
+
+  .patrol-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-brand-500);
+    transform-origin: top;
+    transform: scaleY(var(--fill, 1));
+    transition: transform 120ms linear;
+  }
+
+  @media (min-width: 48rem) {
+    .patrol-segment {
+      top: calc(1.5rem - 1px);
+      left: 50%;
+      width: calc(100% + 1.25rem);
+      height: 2px;
+      background-image: linear-gradient(to right, var(--color-navy-200) 50%, transparent 50%);
+      background-size: 10px 2px;
+    }
+
+    .patrol-fill {
+      transform-origin: left;
+      transform: scaleX(var(--fill, 1));
+    }
+  }
+
+  /* Checkpoint cleared (default state, also without JS or with reduced motion) */
+  .patrol-marker {
+    border: 2px solid var(--color-brand-500);
+    background: var(--color-brand-500);
+    color: var(--color-navy-900);
+    transition:
+      background-color 500ms var(--patrol-ease),
+      border-color 500ms var(--patrol-ease),
+      color 500ms var(--patrol-ease);
+  }
+
+  .patrol-marker::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid var(--color-brand-500);
+    border-radius: 9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .patrol-number,
+  .patrol-check {
+    transition:
+      opacity 400ms var(--patrol-ease),
+      transform 500ms var(--patrol-ease);
+  }
+
+  .patrol-number {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .patrol-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .patrol-card {
+    border-color: color-mix(in srgb, var(--color-brand-500) 35%, white);
+    box-shadow: 0 18px 40px -24px rgb(14 24 45 / 0.25);
+    transition:
+      opacity 700ms var(--patrol-ease),
+      transform 700ms var(--patrol-ease),
+      border-color 700ms var(--patrol-ease),
+      box-shadow 700ms var(--patrol-ease);
+  }
+
+  /* Waiting for the patrol – only while the script drives the timeline */
+  .patrol.is-animated .patrol-step:not([data-reached]) .patrol-marker {
+    border-style: dashed;
+    border-color: var(--color-navy-200);
+    background: white;
+    color: var(--color-navy-500);
+  }
+
+  .patrol.is-animated .patrol-step:not([data-reached]) .patrol-number {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .patrol.is-animated .patrol-step:not([data-reached]) .patrol-check {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .patrol.is-animated .patrol-step:not([data-reached]) .patrol-card {
+    border-color: var(--color-navy-100);
+    box-shadow: none;
+    opacity: 0.55;
+    transform: translateY(12px);
+  }
+
+  .patrol.is-animated .patrol-step[data-reached] .patrol-marker {
+    animation: patrol-pop 600ms var(--patrol-ease);
+  }
+
+  .patrol.is-animated .patrol-step[data-reached] .patrol-marker::after {
+    animation: patrol-ring 900ms ease-out;
+  }
+
+  @keyframes patrol-pop {
+    40% {
+      transform: scale(1.15);
+    }
+  }
+
+  @keyframes patrol-ring {
+    from {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(1.9);
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-patrol]').forEach((list) => {
+    const steps = Array.from(list.querySelectorAll<HTMLElement>('[data-step]'));
+    // Without animation the timeline keeps its fully drawn default state.
+    if (reduceMotion || steps.length < 2) return;
+
+    list.classList.add('is-animated');
+    const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const rect = list.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const span = Math.max(rect.height * 0.6, vh * 0.45);
+      const progress = clamp((vh * 0.75 - rect.top) / span);
+      const scaled = progress * (steps.length - 1);
+
+      steps.forEach((step, index) => {
+        step.style.setProperty('--fill', String(clamp(scaled - index)));
+        step.toggleAttribute('data-reached', progress > 0 && scaled >= index);
+      });
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
+  });
+</script>
