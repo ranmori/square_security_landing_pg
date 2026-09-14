@@ -1,0 +1,52 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<video
+  class="block h-auto w-full"
+  width="960"
+  height="1128"
+  muted
+  loop
+  playsinline
+  preload="none"
+  poster="/video/guard-film-poster.jpg"
+  aria-label={t.home.illustrationAlt}
+  data-hero-film
+>
+  <source src="/video/guard-film.webm" type="video/webm" />
+  <source src="/video/guard-film.mp4" type="video/mp4" />
+</video>
+
+<script>
+  type NetworkNavigator = Navigator & { connection?: { saveData?: boolean } };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = (navigator as NetworkNavigator).connection?.saveData === true;
+
+  document.querySelectorAll<HTMLVideoElement>('[data-hero-film]').forEach((video) => {
+    // Visitors who prefer less motion or save data keep the poster frame.
+    if (reduceMotion || saveData) return;
+
+    video.muted = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.preload = 'auto';
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    observer.observe(video);
+  });
+</script>

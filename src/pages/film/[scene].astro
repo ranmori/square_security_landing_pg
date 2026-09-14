@@ -1,0 +1,33 @@
+---
+// Dev-only stage for rendering the hero film. Never built for production.
+import GuardFilm from '../../components/film/GuardFilm.astro';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { scene: 'guard' } }] : [];
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Guard film</title>
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #0e182d;
+      }
+
+      /* Keep the Astro dev toolbar out of rendered frames */
+      astro-dev-toolbar {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <GuardFilm />
+  </body>
+</html>

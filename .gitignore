@@ -3,6 +3,9 @@ dist/
 .astro/
 .wrangler/
 
+# film render scratch output (stills, test clips)
+.film/
+
 # dependencies
 node_modules/
 
