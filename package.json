@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
-    "film:render": "node scripts/render-film.mjs"
+    "film:render": "node scripts/render-film.mjs",
+    "og:render": "node scripts/render-og.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.3.1",

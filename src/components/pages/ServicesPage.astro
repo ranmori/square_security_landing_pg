@@ -6,6 +6,7 @@ import CustomServiceCard from '../CustomServiceCard.astro';
 import CtaBand from '../CtaBand.astro';
 import { pageAlternates, pagePath, useTranslations, type Lang } from '../../i18n/ui';
 import { getServices } from '../../lib/services';
+import { breadcrumbJsonLd } from '../../lib/seo';
 
 interface Props {
   lang: Lang;
@@ -14,6 +15,8 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const services = await getServices(lang);
+const site = Astro.site ?? new URL('https://square-security.de');
+const crumbs = [{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.services }];
 ---
 
 <BaseLayout
@@ -21,14 +24,10 @@ const services = await getServices(lang);
   title={t.services.metaTitle}
   description={t.services.metaDescription}
   alternates={pageAlternates('services')}
+  jsonLd={[breadcrumbJsonLd(crumbs, site, pagePath('services', lang))]}
+  ogImage={`/og/services-${lang}.png`}
 >
-  <PageHero
-    lang={lang}
-    eyebrow={t.services.eyebrow}
-    title={t.services.title}
-    lead={t.services.lead}
-    crumbs={[{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.services }]}
-  />
+  <PageHero lang={lang} eyebrow={t.services.eyebrow} title={t.services.title} lead={t.services.lead} crumbs={crumbs} />
 
   <section class="section">
     <div class="container-page grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

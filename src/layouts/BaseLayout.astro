@@ -16,14 +16,17 @@ interface Props {
   alternates: Alternates | null;
   noindex?: boolean;
   jsonLd?: Record<string, unknown>[];
+  /** Share image path (1200×630, rendered by npm run og:render); defaults to the home image. */
+  ogImage?: string;
 }
 
-const { lang, title, description, alternates, noindex = false, jsonLd = [] } = Astro.props;
+const { lang, title, description, alternates, noindex = false, jsonLd = [], ogImage } = Astro.props;
 const t = useTranslations(lang);
 const site = Astro.site ?? new URL('https://square-security.de');
 const fullTitle = title ? `${title} | ${t.meta.brandName}` : t.meta.defaultTitle;
 const metaDescription = description ?? t.meta.defaultDescription;
 const canonical = new URL(alternates?.[lang] ?? Astro.url.pathname, site).href;
+const ogImageUrl = new URL(ogImage ?? `/og/home-${lang}.png`, site).href;
 
 const organization = {
   '@context': 'https://schema.org',
@@ -78,6 +81,14 @@ const organization = {
     <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={t.meta.ogLocale} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/png" href="/brand/favicon.png" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />

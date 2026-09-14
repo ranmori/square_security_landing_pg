@@ -33,7 +33,14 @@ const jobSections = (job: JobEntry) => [
 ];
 ---
 
-<BaseLayout lang={lang} title={c.metaTitle} description={c.metaDescription} alternates={pageAlternates('careers')} jsonLd={jsonLd}>
+<BaseLayout
+  lang={lang}
+  title={c.metaTitle}
+  description={c.metaDescription}
+  alternates={pageAlternates('careers')}
+  jsonLd={jsonLd}
+  ogImage={`/og/careers-${lang}.png`}
+>
   <PageHero lang={lang} eyebrow={c.eyebrow} title={c.title} lead={c.lead} crumbs={crumbs}>
     <div class="mt-8">
       <a href="#application" class="btn btn-primary btn-lg">

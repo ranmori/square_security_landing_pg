@@ -1,0 +1,97 @@
+---
+// Dev-only stage for social share images (1200×630). Never built for production.
+// Rendered to public/og/<slug>.png by scripts/render-og.mjs.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/manrope';
+import '../../styles/global.css';
+import GuardFigure from '../../components/illustrations/GuardFigure.astro';
+import { useTranslations, type Lang } from '../../i18n/ui';
+import { getServices } from '../../lib/services';
+
+interface OgCard {
+  slug: string;
+  lang: Lang;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+}
+
+export async function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  const cards: OgCard[] = [];
+  for (const lang of ['de', 'en'] as const) {
+    const t = useTranslations(lang);
+    cards.push(
+      { slug: `home-${lang}`, lang, eyebrow: t.home.eyebrow, title: t.home.title, subtitle: t.home.lead },
+      { slug: `services-${lang}`, lang, eyebrow: t.services.eyebrow, title: t.services.title, subtitle: t.services.lead },
+      { slug: `contact-${lang}`, lang, eyebrow: t.contact.eyebrow, title: t.contact.title, subtitle: t.contact.lead },
+      { slug: `careers-${lang}`, lang, eyebrow: t.careers.eyebrow, title: t.careers.title, subtitle: t.careers.lead },
+    );
+    for (const service of await getServices(lang)) {
+      cards.push({
+        slug: `service-${service.data.key}-${lang}`,
+        lang,
+        eyebrow: t.services.eyebrow,
+        title: service.data.title,
+        subtitle: service.data.summary,
+      });
+    }
+  }
+  return cards.map((card) => ({ params: { slug: card.slug }, props: { card } }));
+}
+
+const { card } = Astro.props as { card: OgCard };
+const titleSize = card.title.length > 34 ? 'text-5xl' : 'text-6xl';
+---
+
+<!doctype html>
+<html lang={card.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>OG · {card.slug}</title>
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        background: #0e182d;
+      }
+
+      astro-dev-toolbar {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="og" class="relative flex h-[630px] w-[1200px] overflow-hidden bg-navy-900">
+      <div aria-hidden="true" class="og-grid absolute inset-0"></div>
+      <div aria-hidden="true" class="absolute -right-40 -bottom-48 size-[40rem] rounded-full bg-brand-500/15 blur-3xl"></div>
+
+      <div class="relative flex w-[780px] flex-col px-20 py-16">
+        <img src="/brand/logo-dark-bg.png" alt="" width="300" height="119" class="h-16 w-auto self-start" />
+        <div class="mt-auto">
+          <p class="font-display text-lg font-bold tracking-[0.18em] text-brand-500 uppercase">{card.eyebrow}</p>
+          <h1 class:list={['mt-4 font-display leading-[1.06] font-extrabold text-white', titleSize]}>{card.title}</h1>
+          <p class="mt-6 line-clamp-2 text-2xl leading-snug text-navy-200">{card.subtitle}</p>
+        </div>
+        <div class="mt-10 h-2 w-28 rounded-full bg-brand-500"></div>
+      </div>
+
+      <div class="relative flex flex-1 items-end justify-center">
+        <svg viewBox="0 0 160 210" overflow="visible" class="mb-12 h-[470px] w-auto">
+          <ellipse cx="62" cy="194" rx="34" ry="5" fill="#000000" opacity="0.35"></ellipse>
+          <GuardFigure beam />
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  .og-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+</style>

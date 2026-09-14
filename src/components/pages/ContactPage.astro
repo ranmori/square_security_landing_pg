@@ -5,6 +5,7 @@ import Icon from '../Icon.astro';
 import ContactForm from '../ContactForm.astro';
 import { company, phoneLabel } from '../../data/company';
 import { pageAlternates, pagePath, useTranslations, type Lang } from '../../i18n/ui';
+import { breadcrumbJsonLd } from '../../lib/seo';
 
 interface Props {
   lang: Lang;
@@ -13,15 +14,24 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const c = t.contact;
+const site = Astro.site ?? new URL('https://square-security.de');
+const crumbs = [{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.contact }];
 ---
 
-<BaseLayout lang={lang} title={c.metaTitle} description={c.metaDescription} alternates={pageAlternates('contact')}>
+<BaseLayout
+  lang={lang}
+  title={c.metaTitle}
+  description={c.metaDescription}
+  alternates={pageAlternates('contact')}
+  jsonLd={[breadcrumbJsonLd(crumbs, site, pagePath('contact', lang))]}
+  ogImage={`/og/contact-${lang}.png`}
+>
   <PageHero
     lang={lang}
     eyebrow={c.eyebrow}
     title={c.title}
     lead={c.lead}
-    crumbs={[{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.contact }]}
+    crumbs={crumbs}
   />
 
   <section class="section">

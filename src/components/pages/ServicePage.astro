@@ -7,8 +7,9 @@ import ServiceCard from '../ServiceCard.astro';
 import CtaBand from '../CtaBand.astro';
 import { serviceIcons } from '../icons';
 import { company, phoneLabel } from '../../data/company';
-import { pagePath, serviceAlternates, useTranslations, type Lang } from '../../i18n/ui';
+import { pagePath, serviceAlternates, servicePath, useTranslations, type Lang } from '../../i18n/ui';
 import { getServices, type ServiceEntry } from '../../lib/services';
+import { breadcrumbJsonLd } from '../../lib/seo';
 
 interface Props {
   lang: Lang;
@@ -21,6 +22,12 @@ const data = service.data;
 const { Content } = await render(service);
 const others = (await getServices(lang)).filter((entry) => entry.data.key !== data.key);
 const phone = phoneLabel(lang);
+const site = Astro.site ?? new URL('https://square-security.de');
+const crumbs = [
+  { label: t.nav.home, href: pagePath('home', lang) },
+  { label: t.nav.services, href: pagePath('services', lang) },
+  { label: data.navTitle },
+];
 
 const faqSchema =
   data.faq.length > 0
@@ -43,7 +50,8 @@ const faqSchema =
   title={data.metaTitle}
   description={data.metaDescription}
   alternates={serviceAlternates(data.key)}
-  jsonLd={faqSchema}
+  jsonLd={[breadcrumbJsonLd(crumbs, site, servicePath(data.key, lang)), ...faqSchema]}
+  ogImage={`/og/service-${data.key}-${lang}.png`}
 >
   <PageHero
     lang={lang}
@@ -52,11 +60,7 @@ const faqSchema =
     icon={serviceIcons[data.key]}
     transitionKey={data.key}
     lead={data.summary}
-    crumbs={[
-      { label: t.nav.home, href: pagePath('home', lang) },
-      { label: t.nav.services, href: pagePath('services', lang) },
-      { label: data.navTitle },
-    ]}
+    crumbs={crumbs}
   >
     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
       <a href={pagePath('contact', lang)} class="btn btn-primary btn-lg">
