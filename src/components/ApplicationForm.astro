@@ -1,0 +1,242 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { pagePath, useTranslations, type Lang } from '../i18n/ui';
+import type { JobEntry } from '../lib/services';
+
+interface Props {
+  lang: Lang;
+  jobs: JobEntry[];
+}
+
+const { lang, jobs } = Astro.props;
+const f = useTranslations(lang).careers.form;
+const siteKey = PUBLIC_TURNSTILE_SITE_KEY;
+const maxUploadBytes = 5 * 1024 * 1024;
+const fileAccept = '.pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png';
+const fileInput =
+  'field-input file:mr-4 file:rounded-md file:border-0 file:bg-navy-900 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white';
+---
+
+<form
+  id="application-form"
+  class="space-y-5"
+  method="post"
+  enctype="multipart/form-data"
+  data-max-bytes={maxUploadBytes}
+  data-msg-success={f.success}
+  data-msg-error={f.error}
+  data-msg-invalid={f.invalid}
+  data-msg-spam={f.spam}
+  data-msg-sending={f.sending}
+  data-msg-too-large={f.tooLarge}
+  data-msg-wrong-type={f.wrongType}
+>
+  <input type="hidden" name="lang" value={lang} />
+
+  <!-- Honeypot: hidden from people, bots tend to fill it in -->
+  <div class="absolute -left-[9999px]" aria-hidden="true">
+    <label for="af-website">Website</label>
+    <input id="af-website" type="text" name="website" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <label for="af-name" class="field-label">{f.name} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input id="af-name" name="name" type="text" required minlength="2" maxlength="120" autocomplete="name" class="field-input" />
+      <p class="field-error" data-error-for="name" data-msg={f.errors.name} hidden></p>
+    </div>
+    <div>
+      <label for="af-email" class="field-label">{f.email} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input id="af-email" name="email" type="email" required maxlength="200" autocomplete="email" class="field-input" />
+      <p class="field-error" data-error-for="email" data-msg={f.errors.email} hidden></p>
+    </div>
+    <div>
+      <label for="af-phone" class="field-label">{f.phone} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input id="af-phone" name="phone" type="tel" required minlength="5" maxlength="60" autocomplete="tel" class="field-input" />
+      <p class="field-error" data-error-for="phone" data-msg={f.errors.phone} hidden></p>
+    </div>
+    <div>
+      <label for="af-position" class="field-label">{f.position}</label>
+      <select id="af-position" name="position" class="field-input">
+        {jobs.map((job) => <option value={job.data.title}>{job.data.title}</option>)}
+        <option value="open">{f.positionOpen}</option>
+      </select>
+    </div>
+    <div>
+      <label for="af-start" class="field-label">{f.startDate}</label>
+      <input id="af-start" name="startDate" type="date" class="field-input" />
+    </div>
+    <div>
+      <label for="af-employment" class="field-label">
+        {f.employmentType} <span class="text-brand-700" aria-hidden="true">*</span>
+      </label>
+      <select id="af-employment" name="employmentType" required class="field-input">
+        <option value="">{f.pleaseSelect}</option>
+        {Object.entries(f.employmentOptions).map(([value, label]) => <option value={value}>{label}</option>)}
+      </select>
+      <p class="field-error" data-error-for="employmentType" data-msg={f.errors.employmentType} hidden></p>
+    </div>
+    <div>
+      <label for="af-qualification" class="field-label">
+        {f.qualification} <span class="text-brand-700" aria-hidden="true">*</span>
+      </label>
+      <select id="af-qualification" name="qualification" required class="field-input">
+        <option value="">{f.pleaseSelect}</option>
+        {Object.entries(f.qualificationOptions).map(([value, label]) => <option value={value}>{label}</option>)}
+      </select>
+      <p class="field-error" data-error-for="qualification" data-msg={f.errors.qualification} hidden></p>
+    </div>
+    <fieldset>
+      <legend class="field-label">{f.licence} <span class="text-brand-700" aria-hidden="true">*</span></legend>
+      <div class="mt-2.5 flex gap-6">
+        <label class="inline-flex items-center gap-2 text-navy-700">
+          <input type="radio" name="licence" value="yes" required class="size-4 accent-navy-900" />
+          {f.yes}
+        </label>
+        <label class="inline-flex items-center gap-2 text-navy-700">
+          <input type="radio" name="licence" value="no" class="size-4 accent-navy-900" />
+          {f.no}
+        </label>
+      </div>
+      <p class="field-error" data-error-for="licence" data-msg={f.errors.licence} hidden></p>
+    </fieldset>
+    <div>
+      <label for="af-languages" class="field-label">{f.languages}</label>
+      <input id="af-languages" name="languages" type="text" maxlength="200" class="field-input" aria-describedby="af-languages-hint" />
+      <p id="af-languages-hint" class="mt-1.5 text-sm text-navy-500">{f.languagesHint}</p>
+    </div>
+  </div>
+
+  <div>
+    <label for="af-message" class="field-label">{f.message}</label>
+    <textarea id="af-message" name="message" rows="4" maxlength="3000" class="field-input resize-y"></textarea>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="af-cv" class="field-label">{f.cv} <span class="text-brand-700" aria-hidden="true">*</span></label>
+      <input id="af-cv" name="cv" type="file" required accept={fileAccept} class={fileInput} />
+      <p class="field-error" data-error-for="cv" data-msg={f.errors.cv} hidden></p>
+    </div>
+    <div>
+      <label for="af-certificates" class="field-label">{f.certificates}</label>
+      <input id="af-certificates" name="certificates" type="file" multiple accept={fileAccept} class={fileInput} />
+      <p class="field-error" data-error-for="certificates" data-msg={f.errors.certificates} hidden></p>
+    </div>
+    <p class="text-sm text-navy-500 sm:col-span-2">{f.filesHint}</p>
+  </div>
+
+  <div>
+    <div class="flex gap-3">
+      <input id="af-privacy" name="privacy" type="checkbox" required class="mt-1 size-4 shrink-0 accent-navy-900" />
+      <label for="af-privacy" class="text-sm leading-relaxed text-navy-600">
+        {f.privacyBefore}<a
+          href={pagePath('privacy', lang)}
+          target="_blank"
+          rel="noopener"
+          class="font-medium text-navy-900 underline decoration-brand-500 underline-offset-2">{f.privacyLink}</a
+        >{f.privacyAfter} <span class="text-brand-700" aria-hidden="true">*</span>
+      </label>
+    </div>
+    <p class="field-error" data-error-for="privacy" data-msg={f.errors.privacy} hidden></p>
+  </div>
+
+  {siteKey && <div class="cf-turnstile" data-sitekey={siteKey} data-language={lang} data-theme="light" data-size="flexible"></div>}
+
+  <p class="text-xs text-navy-500">{f.requiredNote}</p>
+
+  <button type="submit" class="btn btn-primary btn-lg w-full sm:w-auto" data-label={f.submit}>{f.submit}</button>
+
+  <p id="af-status" role="status" aria-live="polite" class="hidden rounded-lg px-4 py-3 text-sm"></p>
+</form>
+
+{siteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<script>
+  import { actions, isInputError } from 'astro:actions';
+
+  type TurnstileWindow = Window & { turnstile?: { reset: () => void } };
+
+  const form = document.querySelector<HTMLFormElement>('#application-form');
+
+  if (form) {
+    const status = form.querySelector<HTMLParagraphElement>('#af-status')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const messages = form.dataset;
+    const maxBytes = Number(messages.maxBytes);
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+
+    const showStatus = (kind: 'success' | 'error', text = '') => {
+      status.textContent = text;
+      status.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+      status.classList.add(...(kind === 'success' ? ['bg-green-50', 'text-green-800'] : ['bg-red-50', 'text-red-800']));
+    };
+
+    const markField = (field: string) => {
+      const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+      if (errorEl) {
+        errorEl.textContent = errorEl.dataset.msg ?? '';
+        errorEl.hidden = false;
+      }
+      form.querySelectorAll(`[name="${field}"]`).forEach((el) => el.setAttribute('aria-invalid', 'true'));
+    };
+
+    const clearFieldErrors = () => {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((el) => {
+        el.hidden = true;
+        el.textContent = '';
+      });
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+    };
+
+    const selectedFiles = () =>
+      ['cv', 'certificates'].flatMap((field) =>
+        Array.from(form.querySelector<HTMLInputElement>(`input[name="${field}"]`)?.files ?? []).map((file) => ({ field, file })),
+      );
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearFieldErrors();
+      status.classList.add('hidden');
+
+      // Check uploads before sending several megabytes to the server.
+      const files = selectedFiles();
+      const wrongType = files.find(({ file }) => !allowedTypes.includes(file.type));
+      if (wrongType) {
+        markField(wrongType.field);
+        showStatus('error', messages.msgWrongType);
+        return;
+      }
+      if (files.reduce((sum, { file }) => sum + file.size, 0) > maxBytes) {
+        markField('cv');
+        showStatus('error', messages.msgTooLarge);
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = messages.msgSending ?? '';
+
+      try {
+        const { error } = await actions.application(new FormData(form));
+        if (!error) {
+          form.reset();
+          showStatus('success', messages.msgSuccess);
+        } else if (isInputError(error)) {
+          Object.keys(error.fields).forEach(markField);
+          showStatus('error', messages.msgInvalid);
+        } else if (error.code === 'CONTENT_TOO_LARGE') {
+          // Our 5 MB file check and Astro's request body limit both use this code.
+          showStatus('error', messages.msgTooLarge);
+        } else {
+          showStatus('error', error.code === 'FORBIDDEN' ? messages.msgSpam : messages.msgError);
+        }
+      } catch {
+        showStatus('error', messages.msgError);
+      } finally {
+        submit.disabled = false;
+        submit.textContent = submit.dataset.label ?? '';
+        (window as TurnstileWindow).turnstile?.reset();
+      }
+    });
+  }
+</script>

@@ -17,6 +17,11 @@ export default defineConfig({
 
   integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
 
+  security: {
+    // Job applications upload CVs (max 5 MB of files); Astro's default action limit is 1 MB.
+    actionBodySizeLimit: 6 * 1024 * 1024,
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

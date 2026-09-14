@@ -22,6 +22,8 @@ const servicesHref = pagePath('services', lang);
 const contactHref = pagePath('contact', lang);
 const isServices = path.startsWith(servicesHref);
 const isContact = path === contactHref;
+const careersHref = pagePath('careers', lang);
+const isCareers = path === careersHref;
 const phone = phoneLabel(lang);
 ---
 
@@ -62,6 +64,9 @@ const phone = phoneLabel(lang);
               }
             </ul>
           </div>
+        </li>
+        <li>
+          <a href={careersHref} class="nav-link" aria-current={isCareers ? 'page' : undefined}>{t.nav.careers}</a>
         </li>
         <li>
           <a href={contactHref} class="nav-link" aria-current={isContact ? 'page' : undefined}>{t.nav.contact}</a>
@@ -121,6 +126,7 @@ const phone = phoneLabel(lang);
             }
           </ul>
         </li>
+        <li><a href={careersHref} class="mobile-link">{t.nav.careers}</a></li>
         <li><a href={contactHref} class="mobile-link">{t.nav.contact}</a></li>
       </ul>
       <div class="mt-4 grid gap-2 sm:grid-cols-2">

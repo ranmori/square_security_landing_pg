@@ -27,6 +27,7 @@ export const pageRoutes = {
   home: { de: '/', en: '/en/' },
   services: { de: '/leistungen/', en: '/en/services/' },
   contact: { de: '/kontakt/', en: '/en/contact/' },
+  careers: { de: '/karriere/', en: '/en/careers/' },
   imprint: { de: '/impressum/', en: '/en/legal-notice/' },
   privacy: { de: '/datenschutz/', en: '/en/privacy/' },
 } as const satisfies Record<string, Record<Lang, string>>;

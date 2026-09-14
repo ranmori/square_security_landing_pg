@@ -22,4 +22,24 @@ const services = defineCollection({
   }),
 });
 
-export const collections = { services };
+const jobs = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/jobs' }),
+  schema: z.object({
+    lang: z.enum(['de', 'en']),
+    /** Language-independent id, shared by the DE and EN posting */
+    key: z.string(),
+    order: z.number().default(1),
+    title: z.string(),
+    location: z.string(),
+    /** schema.org JobPosting employmentType values */
+    employmentTypes: z.array(z.enum(['FULL_TIME', 'PART_TIME', 'TEMPORARY', 'CONTRACTOR', 'OTHER'])),
+    employmentLabel: z.string(),
+    datePosted: z.coerce.date(),
+    summary: z.string(),
+    tasks: z.array(z.string()),
+    requirements: z.array(z.string()),
+    offer: z.array(z.string()),
+  }),
+});
+
+export const collections = { services, jobs };
