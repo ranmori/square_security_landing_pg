@@ -82,7 +82,8 @@ try {
     const outputs = isClip
       ? [['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p', path.join(outDir, 'clip.mp4')]]
       : [
-          ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(args.crf ?? 24), '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', path.join(outDir, 'guard-film.mp4')],
+          // Main@4.0 with the avc1 tag decodes in hardware on every iPhone and Android phone.
+          ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(args.crf ?? 24), '-profile:v', 'main', '-level:v', '4.0', '-tag:v', 'avc1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', path.join(outDir, 'guard-film.mp4')],
           ['-c:v', 'libvpx-vp9', '-pix_fmt', 'yuv420p', '-crf', '34', '-b:v', '0', '-row-mt', '1', '-deadline', 'good', '-cpu-used', '2', '-an', path.join(outDir, 'guard-film.webm')],
         ];
 

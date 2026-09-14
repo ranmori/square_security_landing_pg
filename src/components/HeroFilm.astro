@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { useTranslations, type Lang } from '../i18n/ui';
 
 interface Props {
@@ -9,21 +10,57 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<video
-  class="block h-auto w-full"
-  width="960"
-  height="1128"
-  muted
-  loop
-  playsinline
-  preload="none"
-  poster="/video/guard-film-poster.jpg"
-  aria-label={t.home.illustrationAlt}
-  data-hero-film
->
-  <source src="/video/guard-film.webm" type="video/webm" />
-  <source src="/video/guard-film.mp4" type="video/mp4" />
-</video>
+<div class="hero-film relative" data-hero-film data-play-label={t.home.playFilm} data-pause-label={t.home.pauseFilm}>
+  <video
+    class="block h-auto w-full"
+    width="960"
+    height="1128"
+    muted
+    loop
+    playsinline
+    webkit-playsinline
+    disablepictureinpicture
+    preload="none"
+    poster="/video/guard-film-poster.jpg"
+    aria-label={t.home.illustrationAlt}
+  >
+    <!-- MP4 first: iOS Safari may pick a WebM it cannot decode and never fall back. -->
+    <source src="/video/guard-film.mp4" type='video/mp4; codecs="avc1.4d4028"' />
+    <source src="/video/guard-film.webm" type="video/webm" />
+  </video>
+
+  <button
+    type="button"
+    class="film-toggle absolute top-3 right-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-navy-950/75 py-2 pr-4 pl-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-navy-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:top-4 sm:right-4"
+    aria-label={t.home.playFilm}
+    hidden
+    data-film-toggle
+  >
+    <span class="grid size-8 place-items-center rounded-full bg-brand-500 text-navy-900">
+      <Icon name="play" class="film-icon-play size-4" strokeWidth={2.5} />
+      <Icon name="pause" class="film-icon-pause size-4" strokeWidth={2.5} />
+    </span>
+    <span class="film-label">{t.home.playFilm}</span>
+  </button>
+</div>
+
+<style>
+  /* The icons are rendered by <Icon>, outside this component's scope. */
+  .hero-film :global(.film-icon-pause),
+  .hero-film.is-playing :global(.film-icon-play),
+  .hero-film.is-playing .film-label {
+    display: none;
+  }
+
+  .hero-film.is-playing :global(.film-icon-pause) {
+    display: block;
+  }
+
+  /* While playing only the round pause button stays, so it doesn't cover the scene. */
+  .hero-film.is-playing .film-toggle {
+    padding: 0.5rem;
+  }
+</style>
 
 <script>
   type NetworkNavigator = Navigator & { connection?: { saveData?: boolean } };
@@ -31,22 +68,68 @@ const t = useTranslations(lang);
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const saveData = (navigator as NetworkNavigator).connection?.saveData === true;
 
-  document.querySelectorAll<HTMLVideoElement>('[data-hero-film]').forEach((video) => {
-    // Visitors who prefer less motion or save data keep the poster frame.
-    if (reduceMotion || saveData) return;
+  document.querySelectorAll<HTMLElement>('[data-hero-film]').forEach((root) => {
+    const video = root.querySelector('video');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-film-toggle]');
+    const label = root.querySelector<HTMLElement>('.film-label');
+    if (!video || !toggle || !label) return;
 
+    // Autoplay on phones only works for muted inline video; set the properties too, not just the attributes.
     video.muted = true;
-    const observer = new IntersectionObserver(
+    video.defaultMuted = true;
+    video.playsInline = true;
+
+    let autoplay = !(reduceMotion || saveData);
+    let visible = false;
+    let userPaused = false;
+
+    const render = () => {
+      const playing = !video.paused && !video.ended;
+      root.classList.toggle('is-playing', playing);
+      toggle.setAttribute('aria-label', playing ? root.dataset.pauseLabel! : root.dataset.playLabel!);
+      toggle.hidden = false;
+    };
+
+    const start = () => {
+      video.preload = 'auto';
+      return video.play().catch(() => {
+        // Refused (iPhone Low Power Mode, data saver, browser policy): keep the poster and offer the button.
+        autoplay = false;
+        render();
+      });
+    };
+
+    video.addEventListener('play', render);
+    video.addEventListener('playing', render);
+    video.addEventListener('pause', render);
+    video.addEventListener('error', render, true);
+
+    toggle.addEventListener('click', () => {
+      if (video.paused) {
+        userPaused = false;
+        autoplay = true;
+        void start();
+      } else {
+        userPaused = true;
+        video.pause();
+      }
+    });
+
+    new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          video.preload = 'auto';
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
+        visible = entry.isIntersecting;
+        if (visible && autoplay && !userPaused) void start();
+        else if (!visible) video.pause();
       },
       { threshold: 0.25 },
-    );
-    observer.observe(video);
+    ).observe(video);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) video.pause();
+      else if (visible && autoplay && !userPaused) void start();
+    });
+
+    // Without autoplay the button is the only way in; show it right away.
+    if (!autoplay) render();
   });
 </script>

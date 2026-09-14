@@ -28,7 +28,9 @@ export const de = {
     secondaryCta: 'Unsere Leistungen',
     callHint: 'Oder direkt anrufen:',
     heroCardTitle: 'Ihr Sicherheitspartner in Unterfranken',
-    illustrationAlt: 'Illustration: Sicherheitskraft mit Taschenlampe auf nächtlichem Kontrollgang',
+    illustrationAlt: 'Animierter Kurzfilm: Sicherheitskraft meldet sich per Funk, kontrolliert nachts einen Kontrollpunkt und einen Ausweis am Tor, lässt Gäste zur Veranstaltung ein und salutiert',
+    playFilm: 'Film abspielen',
+    pauseFilm: 'Film pausieren',
     trust: [
       { title: 'Zertifiziert', text: 'Zertifizierter Sicherheitsdienstleister' },
       { title: 'Erfahren', text: 'Seit 2020 im Einsatz – von Unterkünften bis zu Festivals' },
