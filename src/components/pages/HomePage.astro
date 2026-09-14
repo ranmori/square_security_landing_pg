@@ -2,8 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import HeroFilm from '../HeroFilm.astro';
 import Icon from '../Icon.astro';
-import ServiceCard from '../ServiceCard.astro';
-import CustomServiceCard from '../CustomServiceCard.astro';
+import ServiceStack from '../ServiceStack.astro';
 import CtaBand from '../CtaBand.astro';
 import PatrolTimeline from '../PatrolTimeline.astro';
 import type { IconName } from '../icons';
@@ -99,9 +98,8 @@ const whyIcons: IconName[] = ['chat', 'userCheck', 'sliders', 'clipboard'];
         <h2 class="section-title">{h.servicesTitle}</h2>
         <p class="section-lead">{h.servicesLead}</p>
       </div>
-      <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((service) => <ServiceCard service={service} lang={lang} />)}
-        <CustomServiceCard lang={lang} />
+      <div class="mt-12">
+        <ServiceStack services={services} lang={lang} />
       </div>
     </div>
   </section>
