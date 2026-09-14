@@ -1,9 +1,12 @@
 ---
 /**
- * 18-second looping guard film, drawn in SVG and driven by a deterministic render(t) function.
+ * 30-second looping guard film, drawn in SVG and driven by a deterministic render(t) function.
  * Preview: /film/guard/ (dev only). Frames are captured by scripts/render-film.mjs.
+ *
+ * Scenes: radio call → checkpoint → gate ID check → event entrance → salute → brand shield.
  */
 import GuardFigure from '../illustrations/GuardFigure.astro';
+import GuardFront from '../illustrations/GuardFront.astro';
 
 interface Box {
   x: number;
@@ -14,6 +17,8 @@ interface Box {
 }
 
 const groundY = 346;
+// The event area sits this far right of where it was drawn originally (x 400–800).
+const EVENT = 480;
 
 const backBuildings: Box[] = [
   { x: -20, y: 196, w: 70, h: 170 },
@@ -22,7 +27,10 @@ const backBuildings: Box[] = [
   { x: 300, y: 160, w: 70, h: 206 },
   { x: 380, y: 204, w: 76, h: 162 },
   { x: 470, y: 238, w: 60, h: 128 },
+  { x: 560, y: 236, w: 56, h: 130 },
+  { x: 650, y: 196, w: 72, h: 170 },
   { x: 740, y: 220, w: 70, h: 146 },
+  { x: 872, y: 210, w: 64, h: 156 },
 ];
 
 const frontBuildings: Box[] = [
@@ -32,7 +40,7 @@ const frontBuildings: Box[] = [
   { x: 348, y: 262, w: 50, h: 104 },
 ];
 
-// Deterministic window pattern: some lit, a few of those blink. Blink speeds loop cleanly every 18s.
+// Deterministic window pattern: some lit, a few of those blink. Integer speeds loop cleanly every 30s.
 function windowsFor(buildings: Box[], layer: number) {
   return buildings.flatMap((b, bi) => {
     if (b.plain) return [];
@@ -48,7 +56,7 @@ function windowsFor(buildings: Box[], layer: number) {
         y: b.y + 14 + row * 20,
         lit,
         blink: lit && (col + row + bi) % 3 === 0,
-        k: 3 + ((col + bi) % 4),
+        k: 4 + ((col + bi) % 5),
         ph: ((col * 3 + row * 5 + bi) % 7) * 0.9,
       };
     }).filter((w) => w.y + 8 < groundY);
@@ -59,38 +67,53 @@ const backWindows = windowsFor(backBuildings, 0);
 const frontWindows = windowsFor(frontBuildings, 1);
 
 const stars = [
-  [34, 48, 1.6, 3, 0],
-  [86, 26, 1.2, 4, 1.2],
-  [142, 64, 1.4, 5, 2.1],
-  [204, 34, 1.1, 3, 0.6],
-  [252, 112, 1.3, 6, 1.8],
-  [372, 160, 1.2, 4, 2.6],
-  [112, 122, 1, 5, 3.1],
-  [362, 34, 1.1, 6, 1.1],
-  [20, 150, 1.1, 3, 2.4],
+  [34, 48, 1.6, 5, 0],
+  [86, 26, 1.2, 6, 1.2],
+  [142, 64, 1.4, 8, 2.1],
+  [204, 34, 1.1, 5, 0.6],
+  [252, 112, 1.3, 9, 1.8],
+  [372, 160, 1.2, 6, 2.6],
+  [112, 122, 1, 8, 3.1],
+  [362, 34, 1.1, 9, 1.1],
+  [20, 150, 1.1, 5, 2.4],
 ];
 
-// String lights along a sagging wire over the event area
+// Event: string lights along a sagging wire
 const bulbs = Array.from({ length: 16 }, (_, i) => {
   const u = i / 15;
-  const x = (1 - u) ** 2 * 420 + 2 * (1 - u) * u * 605 + u ** 2 * 790;
+  const x = (1 - u) ** 2 * 420 + 2 * (1 - u) * u * 605 + u ** 2 * 790 + EVENT;
   const y = (1 - u) ** 2 * 142 + 2 * (1 - u) * u * 190 + u ** 2 * 146;
-  return { x, y, warm: i % 2 === 0, k: 4 + (i % 3), ph: i * 0.8 };
+  return { x, y, warm: i % 2 === 0, k: 6 + (i % 4), ph: i * 0.8 };
 });
 
 const people = Array.from({ length: 15 }, (_, i) => {
   const back = i % 2 === 0;
   return {
-    x: 552 + i * 13,
+    x: 552 + EVENT + i * 13,
     y: back ? 334 : 342,
     fill: back ? '#2B3D68' : '#1E2B4A',
     head: back ? '#34487A' : '#253457',
-    k: 27 + (i % 4) * 3,
+    k: 45 + (i % 4) * 5,
     ph: i * 1.7,
   };
 });
 
-const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
+const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + EVENT + i * 17.5);
+const fenceBars = [
+  ...Array.from({ length: 8 }, (_, i) => 500 + i * 9),
+  ...Array.from({ length: 5 }, (_, i) => 760 + i * 9),
+];
+const archBulbs = Array.from({ length: 7 }, (_, i) => ({ x: 938 + i * 10.5, k: 7 + (i % 3), ph: i * 1.1 }));
+
+// Civilians share one flat figure (facing right, 120×200 space like the guard).
+const walkers = [
+  { id: 'visitor', jacket: '#56688F', sleeve: '#62759E', shade: '#46577B', legs: '#1B2540', legsBack: '#141C33', hair: '#3B2A20', skin: '#E0AC86', skinShade: '#C48F6B', card: true },
+  { id: 'guest-1', jacket: '#7A4B63', sleeve: '#875670', shade: '#653D52', legs: '#20294A', legsBack: '#172039', hair: '#1E1612', skin: '#8D5B3F', skinShade: '#744830' },
+  { id: 'guest-2', jacket: '#3E6B6A', sleeve: '#487877', shade: '#325857', legs: '#27304F', legsBack: '#1C243E', hair: '#C9A36B', skin: '#F0C3A0', skinShade: '#D6A582' },
+  { id: 'guest-3', jacket: '#8A6A3E', sleeve: '#977648', shade: '#735733', legs: '#1D2645', legsBack: '#151C35', hair: '#5A3A2A', skin: '#B97E5A', skinShade: '#9C6545' },
+];
+const shieldOuter = 'M-65 -75 H65 V-5 C65 45 30 70 0 80 C-30 70 -65 45 -65 -5 Z';
+const shieldInner = 'M-50 -60 H50 V-6 C50 32 23 52 0 60 C-23 52 -50 32 -50 -6 Z';
 ---
 
 <svg id="film" viewBox="0 0 400 470" width="960" height="1128" xmlns="http://www.w3.org/2000/svg">
@@ -131,7 +154,7 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
     ))
   }
 
-  <!-- World: night street (x 0–400) and event area (x 400–800); the camera pans across it -->
+  <!-- World: street (x 0–400), property gate (400–800), event (800–1200); the camera pans across it -->
   <g id="film-world">
     {backBuildings.map((b) => <rect x={b.x} y={b.y} width={b.w} height={b.h} fill="#16223F" />)}
     {
@@ -169,7 +192,7 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
       ))
     }
 
-    <!-- Checkpoint building: a few windows, a door and the checkpoint plate -->
+    <!-- Street: checkpoint building with a few windows, a door and the checkpoint plate -->
     {
       [236, 256, 276, 316].map((x, i) => (
         <rect x={x} y="228" width="7" height="9" rx="1" fill={i === 1 ? '#F7981D' : '#18223A'} opacity={i === 1 ? 0.8 : 1} />
@@ -192,15 +215,38 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
       stroke-dashoffset="30"></path>
     <circle id="film-plate-ring" data-r="11" cx="322" cy="198" r="11" fill="none" stroke="#F7981D" stroke-width="2" opacity="0"></circle>
 
-    <!-- Street lamp between the two areas -->
-    <circle cx="426" cy="206" r="34" fill="url(#film-lamp-glow)"></circle>
-    <rect x="407" y="196" width="5" height="150" fill="#1F2B47"></rect>
-    <rect x="407" y="196" width="20" height="3" fill="#1F2B47"></rect>
-    <rect x="420" y="196" width="12" height="6" rx="2" fill="#2C3A58"></rect>
-    <circle cx="426" cy="203" r="2.5" fill="#F3E9D2"></circle>
+    <!-- Street lamps between the areas -->
+    {
+      [0, 405].map((dx) => (
+        <g transform={`translate(${dx} 0)`}>
+          <circle cx="426" cy="206" r="34" fill="url(#film-lamp-glow)" />
+          <rect x="407" y="196" width="5" height="150" fill="#1F2B47" />
+          <rect x="407" y="196" width="20" height="3" fill="#1F2B47" />
+          <rect x="420" y="196" width="12" height="6" rx="2" fill="#2C3A58" />
+          <circle cx="426" cy="203" r="2.5" fill="#F3E9D2" />
+        </g>
+      ))
+    }
+
+    <!-- Gate: fence, gatehouse with lit window and company plate -->
+    <rect x="496" y="300" width="72" height="2.4" fill="#22315A"></rect>
+    <rect x="496" y="326" width="72" height="2.4" fill="#22315A"></rect>
+    <rect x="756" y="300" width="46" height="2.4" fill="#22315A"></rect>
+    <rect x="756" y="326" width="46" height="2.4" fill="#22315A"></rect>
+    {fenceBars.map((x) => <rect x={x} y="292" width="2.4" height="54" fill="#22315A" />)}
+    <rect x="428" y="252" width="64" height="94" fill="#1B2745"></rect>
+    <rect x="422" y="244" width="76" height="9" fill="#34415B"></rect>
+    <rect x="422" y="252" width="76" height="3" fill="#F7981D" opacity="0.85"></rect>
+    <rect x="438" y="266" width="44" height="30" rx="2" fill="#F7981D" opacity="0.75"></rect>
+    <rect x="459" y="266" width="2" height="30" fill="#1B2745"></rect>
+    <rect x="444" y="304" width="18" height="42" fill="#22315A"></rect>
+    <g transform="translate(478 322) scale(0.09)">
+      <path d={shieldOuter} fill="#F7981D"></path>
+      <path d={shieldInner} fill="#1B2745"></path>
+    </g>
 
     <!-- Event: string lights -->
-    <path d="M420 142 Q605 190 790 146" fill="none" stroke="#3D4F75" stroke-width="1.2"></path>
+    <path d={`M${420 + EVENT} 142 Q${605 + EVENT} 190 ${790 + EVENT} 146`} fill="none" stroke="#3D4F75" stroke-width="1.2"></path>
     {
       bulbs.map((b) => (
         <circle cx={b.x} cy={b.y + 3} r="2.6" fill={b.warm ? '#F7981D' : '#F3E9D2'} data-twinkle data-k={b.k} data-ph={b.ph} data-min="0.45" />
@@ -208,25 +254,36 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
     }
 
     <!-- Event: stage -->
-    <rect x="566" y="186" width="158" height="114" fill="#111B33"></rect>
-    <rect x="580" y="198" width="130" height="80" rx="3" fill="#1A2848"></rect>
-    <g transform="translate(645 238) scale(0.3)">
-      <path d="M-65 -75 H65 V-5 C65 45 30 70 0 80 C-30 70 -65 45 -65 -5 Z" fill="#F7981D"></path>
-      <path d="M-50 -60 H50 V-6 C50 32 23 52 0 60 C-23 52 -50 32 -50 -6 Z" fill="#1A2848"></path>
+    <g transform={`translate(${EVENT} 0)`}>
+      <rect x="566" y="186" width="158" height="114" fill="#111B33"></rect>
+      <rect x="580" y="198" width="130" height="80" rx="3" fill="#1A2848"></rect>
+      <g transform="translate(645 238) scale(0.3)">
+        <path d={shieldOuter} fill="#F7981D"></path>
+        <path d={shieldInner} fill="#1A2848"></path>
+      </g>
+      <rect x="552" y="170" width="186" height="8" fill="#34415B"></rect>
+      <rect x="552" y="170" width="8" height="130" fill="#34415B"></rect>
+      <rect x="730" y="170" width="8" height="130" fill="#34415B"></rect>
+      <path d="M600 182 L556 336 L644 336 Z" fill="url(#film-spot)" data-spot data-cx="600" data-cy="180" data-dir="1" data-ph="0"></path>
+      <path d="M690 182 L646 336 L734 336 Z" fill="url(#film-spot)" data-spot data-cx="690" data-cy="180" data-dir="-1" data-ph="1.3"></path>
+      <rect x="594" y="176" width="12" height="8" rx="2" fill="#2C3A58"></rect>
+      <rect x="684" y="176" width="12" height="8" rx="2" fill="#2C3A58"></rect>
+      <rect x="548" y="300" width="196" height="46" fill="#18223A"></rect>
+      <rect x="548" y="300" width="196" height="3" fill="#F7981D" opacity="0.8"></rect>
     </g>
-    <rect x="552" y="170" width="186" height="8" fill="#34415B"></rect>
-    <rect x="552" y="170" width="8" height="130" fill="#34415B"></rect>
-    <rect x="730" y="170" width="8" height="130" fill="#34415B"></rect>
-    <path d="M600 182 L556 336 L644 336 Z" fill="url(#film-spot)" data-spot data-cx="600" data-cy="180" data-dir="1" data-ph="0"></path>
-    <path d="M690 182 L646 336 L734 336 Z" fill="url(#film-spot)" data-spot data-cx="690" data-cy="180" data-dir="-1" data-ph="1.3"></path>
-    <rect x="594" y="176" width="12" height="8" rx="2" fill="#2C3A58"></rect>
-    <rect x="684" y="176" width="12" height="8" rx="2" fill="#2C3A58"></rect>
-    <rect x="548" y="300" width="196" height="46" fill="#18223A"></rect>
-    <rect x="548" y="300" width="196" height="3" fill="#F7981D" opacity="0.8"></rect>
+
+    <!-- Event: lit entrance arch -->
+    <ellipse cx="964" cy="292" rx="72" ry="62" fill="url(#film-lamp-glow)"></ellipse>
+    <rect x="932" y="250" width="12" height="96" fill="#34415B"></rect>
+    <rect x="984" y="250" width="12" height="96" fill="#34415B"></rect>
+    <rect x="926" y="236" width="76" height="16" rx="2" fill="#1A2848"></rect>
+    <rect x="926" y="236" width="76" height="2.6" fill="#F7981D"></rect>
+    <rect x="926" y="249.4" width="76" height="2.6" fill="#F7981D"></rect>
+    {archBulbs.map((b) => <circle cx={b.x} cy="244" r="1.8" fill="#F3E9D2" data-twinkle data-k={b.k} data-ph={b.ph} data-min="0.4" />)}
 
     <!-- Ground -->
-    <rect x="-40" y={groundY} width="880" height="124" fill="#080E1C"></rect>
-    <rect x="-40" y={groundY} width="880" height="2" fill="#22325A"></rect>
+    <rect x="-40" y={groundY} width="1300" height="124" fill="#080E1C"></rect>
+    <rect x="-40" y={groundY} width="1300" height="2" fill="#22325A"></rect>
 
     <!-- Event: crowd behind the barrier -->
     {
@@ -237,15 +294,69 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
         </g>
       ))
     }
-    <rect x="530" y="318" width="214" height="2.6" fill="#9AA6BD"></rect>
-    <rect x="530" y="338" width="214" height="2.6" fill="#9AA6BD"></rect>
+    <rect x={530 + EVENT} y="318" width="214" height="2.6" fill="#9AA6BD"></rect>
+    <rect x={530 + EVENT} y="338" width="214" height="2.6" fill="#9AA6BD"></rect>
     {barrierPosts.map((x) => <rect x={x} y="318" width="2" height="28" fill="#9AA6BD" />)}
 
-    <!-- The guard -->
-    <g id="film-guard" transform="translate(-237.5 106) scale(1.25)">
+    <!-- Visitor and guests -->
+    {
+      walkers.map((p) => (
+        <g id={`film-${p.id}`} data-walker transform="translate(-200 106) scale(1.25)">
+          <g class="p-leg-back">
+            <path d="M51 110 H62 L61 186 H52 Z" fill={p.legsBack} />
+            <path d="M51 184 H61 C67 184.5 70 187.5 70 192 H50 C49.5 188 50 185.5 51 184 Z" fill="#141A28" />
+          </g>
+          <g class="p-arm-back">
+            <rect x="45" y="56" width="10" height="46" rx="5" fill={p.shade} />
+            <circle cx="50" cy="104" r="4.4" fill={p.skinShade} />
+          </g>
+          <g class="p-leg-front">
+            <path d="M62 110 H74 L73 186 H63 Z" fill={p.legs} />
+            <path d="M63 184 H73 C79 184.5 82 187.5 82 192 H62 C61.5 188 62 185.5 63 184 Z" fill="#1A2030" />
+          </g>
+          <g class="p-body">
+            <path d="M47 62 C47 55 52 52 58 52 H68 C74 52 78 55 78 62 L77 116 H48 Z" fill={p.jacket} />
+            <rect x="58" y="44" width="9" height="10" fill={p.skinShade} />
+            <circle cx="63" cy="34" r="12" fill={p.skin} />
+            <path d="M51 32 C51 20 57 17 63 17 C70 17 75 21 75 29 C70 26 62 26 56 30 L54 40 C52 38 51 35 51 32 Z" fill={p.hair} />
+          </g>
+          <g class="p-arm-front">
+            <rect x="67" y="56" width="10" height="46" rx="5" fill={p.sleeve} />
+            <circle cx="72" cy="104" r="4.6" fill={p.skin} />
+            {p.card && <circle id="film-card-glow" cx="74" cy="107.5" r="11" fill="#F7981D" opacity="0" />}
+            {p.card && <rect x="68" y="103" width="12" height="9" rx="1.2" fill="#F3E9D2" />}
+            {p.card && <rect x="68" y="103" width="12" height="2.6" fill="#F7981D" />}
+          </g>
+        </g>
+      ))
+    }
+
+    <!-- Gate: barrier (in front of the visitor) -->
+    <rect x="569" y="296" width="12" height="50" rx="2" fill="#34415B"></rect>
+    <g id="film-barrier">
+      <rect x="575" y="303" width="176" height="7" rx="3.5" fill="#F3E9D2"></rect>
+      {[595, 625, 655, 685, 715].map((x) => <rect x={x} y="303" width="14" height="7" fill="#F7981D" />)}
+      <circle cx="748" cy="306.5" r="3" fill="#F7981D"></circle>
+    </g>
+    <rect x="566" y="316" width="18" height="14" rx="2" fill="#22315A"></rect>
+    <circle cx="575" cy="306.5" r="4" fill="#9AA6BD"></circle>
+
+    <!-- The guard: side view for walking, front view for the salute -->
+    <g id="film-guard" transform="translate(-7.5 106) scale(1.25)">
       <ellipse cx="62" cy="110" rx="90" ry="105" fill="url(#film-guard-glow)"></ellipse>
       <ellipse cx="62" cy="193" rx="30" ry="4" fill="#000000" opacity="0.3"></ellipse>
-      <GuardFigure beam />
+      <g id="film-guard-side">
+        <GuardFigure beam />
+      </g>
+      <g id="film-guard-front" opacity="0">
+        <GuardFront />
+      </g>
+    </g>
+
+    <!-- Gate: approval tick above the visitor's pass -->
+    <g id="film-card-tick" opacity="0" transform="translate(647 156)">
+      <circle r="10" fill="#F7981D"></circle>
+      <path d="M-4.5 0.5 L-1.2 3.8 L5 -3.2" fill="none" stroke="#0E182D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
     </g>
   </g>
 
@@ -254,8 +365,8 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
   <circle id="film-ring-1" data-r="80" cx="200" cy="216" r="80" fill="none" stroke="#F7981D" stroke-width="3" opacity="0"></circle>
   <circle id="film-ring-2" data-r="80" cx="200" cy="216" r="80" fill="none" stroke="#F7981D" stroke-width="2" opacity="0"></circle>
   <g id="film-shield" opacity="0" transform="translate(200 214)">
-    <path d="M-65 -75 H65 V-5 C65 45 30 70 0 80 C-30 70 -65 45 -65 -5 Z" fill="#F7981D"></path>
-    <path d="M-50 -60 H50 V-6 C50 32 23 52 0 60 C-23 52 -50 32 -50 -6 Z" fill="#0E182D"></path>
+    <path d={shieldOuter} fill="#F7981D"></path>
+    <path d={shieldInner} fill="#0E182D"></path>
     <path
       id="film-shield-check"
       d="M-24 2 L-6 20 L28 -18"
@@ -283,29 +394,42 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
 <script>
   type Film = { duration: number; fps: number; render: (t: number) => void; ready: boolean };
   type FilmWindow = Window & { __film?: Film };
+  type Key = [time: number, value: number];
 
-  const D = 18;
+  const D = 30;
   const FPS = 30;
   const TAU = Math.PI * 2;
-  const RESET = 13.5; // world resets behind the fully opaque overlay
+  const RESET = 25.8; // world resets behind the fully opaque overlay
+  const SCALE = 1.25;
 
   const clamp = (v: number, min = 0, max = 1) => Math.min(Math.max(v, min), max);
   const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
   const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
   const easeInOut = (p: number) => (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2);
-  const easeOut = (p: number) => 1 - (1 - p) ** 2;
   const easeOutBack = (p: number) => 1 + 2.70158 * (p - 1) ** 3 + 1.70158 * (p - 1) ** 2;
-  // Integer k keeps every periodic effect seamless over the 18s loop.
+  // Up between a–b, back down between c–d.
+  const hold = (t: number, a: number, b: number, c: number, d: number) => easeInOut(seg(t, a, b)) - easeInOut(seg(t, c, d));
+  // Integer k keeps every periodic effect seamless over the 30s loop.
   const loopWave = (t: number, k: number, phase = 0) => Math.sin((TAU * k * t) / D + phase);
 
-  const guardX = (t: number) => {
-    if (t < 5) return lerp(-160, 190, easeOut(seg(t, 0, 5)));
-    if (t < 8) return 190;
-    if (t < 10.5) return lerp(190, 470, easeInOut(seg(t, 8, 10.5)));
-    if (t < RESET) return 470;
-    return -160;
+  // Value tracks: hold the first value, ease between keys, hold the last value.
+  const track = (keys: Key[], ease = easeInOut) => (t: number) => {
+    if (t <= keys[0][0]) return keys[0][1];
+    for (let i = 0; i < keys.length - 1; i++) {
+      const [t0, v0] = keys[i];
+      const [t1, v1] = keys[i + 1];
+      if (t < t1) return lerp(v0, v1, ease(seg(t, t0, t1)));
+    }
+    return keys[keys.length - 1][1];
   };
-  const cameraX = (t: number) => (t < RESET ? lerp(0, 330, easeInOut(seg(t, 8.2, 10.4))) : 0);
+  const beforeReset = (fn: (t: number) => number, rest: number) => (t: number) => (t < RESET ? fn(t) : rest);
+
+  const guardX = beforeReset(track([[3.3, 70], [5.5, 190], [8, 190], [10.8, 520], [16.8, 520], [19.8, 1040]]), 70);
+  const cameraX = beforeReset(track([[8.2, 0], [10.6, 400], [17, 400], [19.6, 800]]), 0);
+  const visitorX = beforeReset(track([[10.4, 900], [12.4, 720], [15, 720], [17, 300]]), 900);
+  const beamLevel = beforeReset(track([[8.4, 1], [8.9, 0], [12.7, 0], [13, 1], [14.3, 1], [14.7, 0]]), 1);
+  const GUEST_STARTS = [20.1, 21.2, 22.3];
+  const GUEST_WALK = 2.2;
 
   const one = <T extends Element>(selector: string) => document.querySelector<T>(selector)!;
   const all = <T extends Element>(selector: string) => Array.from(document.querySelectorAll<T>(selector));
@@ -314,16 +438,26 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
   const world = one<SVGGElement>('#film-world');
   const moon = one<SVGGElement>('#film-moon');
   const guard = one<SVGGElement>('#film-guard');
-  const legFront = one<SVGGElement>('#film-guard .g-leg-front');
-  const legBack = one<SVGGElement>('#film-guard .g-leg-back');
-  const armFront = one<SVGGElement>('#film-guard .g-arm-front');
-  const armBack = one<SVGGElement>('#film-guard .g-arm-back');
-  const body = one<SVGGElement>('#film-guard .g-body');
-  const beam = one<SVGPathElement>('#film-guard .g-beam');
-  const glow = one<SVGCircleElement>('#film-guard .g-glow');
+  const guardSide = one<SVGGElement>('#film-guard-side');
+  const guardFront = one<SVGGElement>('#film-guard-front');
+  const legFront = one<SVGGElement>('#film-guard-side .g-leg-front');
+  const legBack = one<SVGGElement>('#film-guard-side .g-leg-back');
+  const armFront = one<SVGGElement>('#film-guard-side .g-arm-front');
+  const armBack = one<SVGGElement>('#film-guard-side .g-arm-back');
+  const body = one<SVGGElement>('#film-guard-side .g-body');
+  const beam = one<SVGPathElement>('#film-guard-side .g-beam');
+  const glow = one<SVGCircleElement>('#film-guard-side .g-glow');
+  const led = one<SVGCircleElement>('#film-guard-side .g-led');
+  const radioHand = one<SVGGElement>('#film-guard-side .g-radio-hand');
+  const speech = all<SVGPathElement>('#film-guard-side .g-speech');
+  const saluteArm = one<SVGGElement>('#film-guard-front .gf-arm-salute');
+  const saluteForearm = one<SVGGElement>('#film-guard-front .gf-forearm');
   const plateLit = one<SVGCircleElement>('#film-plate-lit');
   const plateCheck = one<SVGPathElement>('#film-plate-check');
   const plateRing = one<SVGCircleElement>('#film-plate-ring');
+  const barrier = one<SVGGElement>('#film-barrier');
+  const cardGlow = one<SVGCircleElement>('#film-card-glow');
+  const cardTick = one<SVGGElement>('#film-card-tick');
   const overlay = one<SVGRectElement>('#film-overlay');
   const shield = one<SVGGElement>('#film-shield');
   const shieldCheck = one<SVGPathElement>('#film-shield-check');
@@ -334,50 +468,119 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
   const people = all<SVGGElement>('[data-person]');
   const spots = all<SVGPathElement>('[data-spot]');
 
+  const walker = (id: string) => {
+    const el = one<SVGGElement>(`#film-${id}`);
+    const part = (name: string) => el.querySelector<SVGGElement>(`.p-${name}`)!;
+    return { el, legFront: part('leg-front'), legBack: part('leg-back'), armFront: part('arm-front'), armBack: part('arm-back'), body: part('body') };
+  };
+  const visitor = walker('visitor');
+  const guests = GUEST_STARTS.map((_, i) => walker(`guest-${i + 1}`));
+
+  // Walk cycles are driven by distance, so feet never slide. Returns the current swing.
+  const pose = (w: ReturnType<typeof walker>, x: number, facing: 1 | -1, amp: number, armLift = 0) => {
+    const phase = (x / 44) * TAU;
+    const swing = Math.sin(phase) * amp;
+    w.el.setAttribute('transform', `translate(${x - 62 * SCALE * facing} 106) scale(${SCALE * facing} ${SCALE})`);
+    w.legFront.setAttribute('transform', `rotate(${20 * swing} 67.5 110)`);
+    w.legBack.setAttribute('transform', `rotate(${-20 * swing} 56.5 110)`);
+    w.armBack.setAttribute('transform', `rotate(${14 * swing} 50 58)`);
+    w.armFront.setAttribute('transform', `rotate(${-14 * swing - armLift} 72 58)`);
+    w.body.setAttribute('transform', `translate(0 ${-1.5 * Math.abs(Math.sin(phase)) * amp})`);
+  };
+
+  const speedOf = (fn: (t: number) => number, t: number) =>
+    t < RESET ? Math.abs(fn(Math.min(t + 0.02, RESET - 0.001)) - fn(Math.max(t - 0.02, 0))) / 0.04 : 0;
+
   const ring = (el: SVGCircleElement, p: number, grow: number, maxOpacity: number) => {
     const active = p > 0 && p < 1;
     el.setAttribute('r', String(num(el, 'r') * (1 + grow * p)));
     el.setAttribute('opacity', String(active ? maxOpacity * (1 - p) : 0));
   };
 
+  // Horizontal scale around the figure's centre line; negative values mirror it (turning around).
+  const squash = (el: SVGGElement, scale: number) => {
+    const safe = Math.abs(scale) < 0.001 ? 0.001 : scale;
+    el.setAttribute('transform', `translate(62 0) scale(${safe} 1) translate(-62 0)`);
+    el.setAttribute('opacity', Math.abs(scale) < 0.02 ? '0' : '1');
+  };
+
   function render(time: number) {
     const t = ((time % D) + D) % D;
+    const live = t < RESET;
     const cam = cameraX(t);
     const gx = guardX(t);
 
     world.setAttribute('transform', `translate(${-cam} 0)`);
     moon.setAttribute('transform', `translate(${-cam * 0.08} 0)`);
-    guard.setAttribute('transform', `translate(${gx - 77.5} 106) scale(1.25)`);
+    guard.setAttribute('transform', `translate(${gx - 62 * SCALE} 106) scale(${SCALE})`);
 
-    // Walk cycle driven by distance, so the feet never slide
-    const speed = Math.abs(guardX(Math.min(t + 0.02, RESET - 0.001)) - guardX(Math.max(t - 0.02, 0))) / 0.04;
-    const amp = t < RESET ? clamp(speed / 70) : 0;
+    // --- Guard walk cycle
+    const amp = clamp(speedOf(guardX, t) / 70);
     const phase = (gx / 44) * TAU;
     const swing = Math.sin(phase) * amp;
     legFront.style.transform = `rotate(${20 * swing}deg)`;
     legBack.style.transform = `rotate(${-20 * swing}deg)`;
-    armBack.style.transform = `rotate(${14 * swing}deg)`;
-    body.style.transform = `translateY(${-1.5 * Math.abs(Math.sin(phase)) * amp}px)`;
 
-    const raise = easeInOut(seg(t, 5.1, 5.5)) - easeInOut(seg(t, 7.4, 7.8));
-    const waveUp = easeInOut(seg(t, 10.7, 11.1)) - easeInOut(seg(t, 12.3, 12.7));
-    const wiggle = 12 * Math.sin(TAU * 2 * (t - 11.1)) * seg(t, 11.1, 11.3) * (1 - seg(t, 12.1, 12.3));
-    const sweep = 5 * loopWave(t, 3) * (1 - raise) * (1 - waveUp);
+    // --- Radio call: far hand to the radio, LED and speech arcs while talking
+    const reach = live ? hold(t, 0.4, 0.7, 2.8, 3.1) : 0;
+    const handOnRadio = t >= 0.7 && t < 2.8;
+    const talking = t >= 0.9 && t < 2.6;
+    armBack.style.transform = `rotate(${14 * swing - 40 * reach}deg)`;
+    armBack.style.opacity = handOnRadio ? '0' : '1';
+    radioHand.style.opacity = handOnRadio ? '1' : '0';
+    led.style.opacity = talking && Math.sin(TAU * 5 * t) < 0 ? '0.25' : '1';
+    speech.forEach((arc, i) => {
+      const p = ((((t - 0.9) * 1.5 - i * 0.22) % 1) + 1) % 1;
+      arc.style.opacity = talking ? String(Math.sin(Math.PI * p)) : '0';
+    });
+    const nod = talking ? 0.8 * Math.abs(Math.sin(TAU * 2.5 * t)) : 0;
+    body.style.transform = `translateY(${-1.5 * Math.abs(Math.sin(phase)) * amp - nod}px)`;
+
+    // --- Flashlight arm: checkpoint and gate raises, event waves, idle sweep
+    const raise = live ? hold(t, 5.6, 6, 7.6, 8) + hold(t, 12.6, 13, 14.1, 14.5) : 0;
+    const waveUp = live ? hold(t, 20.3, 20.7, 23, 23.4) : 0;
+    const wiggle = 12 * Math.sin(TAU * 2 * (t - 20.7)) * seg(t, 20.7, 20.9) * (1 - seg(t, 22.8, 23));
+    const sweep = 5 * loopWave(t, 5) * (1 - raise) * (1 - waveUp);
     armFront.style.transform = `rotate(${-14 * swing + sweep - 35 * raise - 110 * waveUp + wiggle}deg)`;
-
-    const beamOn = t < RESET ? 1 - seg(t, 9.5, 10) : 1;
-    beam.style.opacity = String(beamOn * seg(gx, -60, 20));
-    const flash = seg(t, 5.55, 6.15);
+    beam.style.opacity = String(beamLevel(t));
+    const flash = seg(t, 6.05, 6.65);
     glow.style.opacity = String(0.9 * Math.sin(Math.PI * flash));
     glow.style.transform = `scale(${0.4 + 1.4 * flash})`;
 
-    // Checkpoint plate
-    const active = t < RESET;
-    plateLit.setAttribute('opacity', String(active ? easeInOut(seg(t, 5.7, 6)) : 0));
-    plateCheck.style.strokeDashoffset = String(30 * (1 - (active ? easeInOut(seg(t, 5.85, 6.25)) : 0)));
-    ring(plateRing, active ? seg(t, 5.9, 6.9) : 0, 1.4, 0.7);
+    // --- Checkpoint plate
+    plateLit.setAttribute('opacity', String(live ? easeInOut(seg(t, 6.2, 6.5)) : 0));
+    plateCheck.style.strokeDashoffset = String(30 * (1 - (live ? easeInOut(seg(t, 6.35, 6.75)) : 0)));
+    ring(plateRing, live ? seg(t, 6.4, 7.4) : 0, 1.4, 0.7);
 
-    // Ambient life
+    // --- Gate: visitor walks up, shows the pass, barrier lifts, visitor walks through
+    const vx = visitorX(t);
+    const showPass = live ? hold(t, 12.5, 12.9, 14, 14.4) : 0;
+    pose(visitor, vx, -1, clamp(speedOf(visitorX, t) / 70), 75 * showPass);
+    cardGlow.setAttribute('opacity', String(live ? 0.9 * Math.sin(Math.PI * seg(t, 13.2, 13.9)) : 0));
+    const tick = live ? easeOutBack(seg(t, 13.4, 13.75)) * (1 - easeInOut(seg(t, 14.6, 14.9))) : 0;
+    cardTick.setAttribute('transform', `translate(647 156) scale(${Math.max(tick, 0.001)})`);
+    cardTick.setAttribute('opacity', tick > 0.01 ? '1' : '0');
+    const lift = live ? hold(t, 14.3, 14.9, 16.4, 17) : 0;
+    barrier.setAttribute('transform', `rotate(${-80 * lift} 575 306.5)`);
+
+    // --- Event entrance: the guard turns to face the arch, guests walk in and fade into the crowd
+    guests.forEach((guest, i) => {
+      const start = GUEST_STARTS[i];
+      const walking = live && t >= start && t < start + GUEST_WALK;
+      const x = lerp(780, 1000, seg(t, start, start + GUEST_WALK));
+      pose(guest, x, 1, walking ? 1 : 0);
+      guest.el.setAttribute('opacity', walking ? String(1 - seg(x, 972, 998)) : '0');
+    });
+
+    // --- Salute: turn to the viewer, right hand to the cap
+    const facing = live ? lerp(1, -1, easeInOut(seg(t, 19.8, 20.1))) : 1;
+    squash(guardSide, facing * (1 - (live ? easeInOut(seg(t, 23.6, 23.85)) : 0)));
+    squash(guardFront, live ? easeInOut(seg(t, 23.85, 24.1)) : 0);
+    const salute = live ? easeInOut(seg(t, 24.2, 24.6)) : 0;
+    saluteArm.setAttribute('transform', `rotate(${115 * salute} 44 58)`);
+    saluteForearm.setAttribute('transform', `rotate(${126 * salute} 44 86)`);
+
+    // --- Ambient life
     twinkles.forEach((el) => {
       const min = num(el, 'min');
       el.setAttribute('opacity', String(min + (1 - min) * (0.5 + 0.5 * loopWave(t, num(el, 'k'), num(el, 'ph')))));
@@ -389,25 +592,25 @@ const barrierPosts = Array.from({ length: 13 }, (_, i) => 530 + i * 17.5);
       el.setAttribute('transform', `translate(0 ${-2 * Math.max(0, loopWave(t, num(el, 'k'), num(el, 'ph')))})`);
     });
     spots.forEach((el) => {
-      const angle = num(el, 'dir') * 16 * loopWave(t, 4, num(el, 'ph'));
+      const angle = num(el, 'dir') * 16 * loopWave(t, 6, num(el, 'ph'));
       el.setAttribute('transform', `rotate(${angle} ${num(el, 'cx')} ${num(el, 'cy')})`);
     });
 
-    // Shield moment
-    const cover = t < RESET ? easeInOut(seg(t, 12.9, RESET)) : 1 - easeInOut(seg(t, 16, 17));
+    // --- Shield moment: the salute badge grows into the brand shield
+    const cover = live ? easeInOut(seg(t, 25.3, RESET)) : 1 - easeInOut(seg(t, 28.8, 29.6));
     overlay.setAttribute('opacity', String(cover));
 
-    const grow = seg(t, 13.15, 13.85);
-    const shrink = easeInOut(seg(t, 15.7, 16.2));
-    const move = easeInOut(seg(t, 13.15, 13.7));
-    const badgeX = 470 - 77.5 + 71.5 * 1.25 - 330;
-    const badgeY = 106 + 73 * 1.25;
+    const grow = seg(t, 26, 26.7);
+    const shrink = easeInOut(seg(t, 28.4, 28.9));
+    const move = easeInOut(seg(t, 26, 26.55));
+    const badgeX = 1040 - 62 * SCALE + 71.5 * SCALE - 800;
+    const badgeY = 106 + 73 * SCALE;
     const scale = lerp(0.085, 1, easeOutBack(grow)) * lerp(1, 0.6, shrink);
     shield.setAttribute('transform', `translate(${lerp(badgeX, 200, move)} ${lerp(badgeY, 214, move)}) scale(${scale})`);
-    shield.setAttribute('opacity', String(grow > 0 ? seg(t, 13.15, 13.3) * (1 - shrink) : 0));
-    shieldCheck.style.strokeDashoffset = String(80 * (1 - easeInOut(seg(t, 13.8, 14.25))));
-    ring(ring1, seg(t, 14, 15.1), 0.8, 0.8);
-    ring(ring2, seg(t, 14.4, 15.5), 0.8, 0.6);
+    shield.setAttribute('opacity', String(grow > 0 ? seg(t, 26, 26.15) * (1 - shrink) : 0));
+    shieldCheck.style.strokeDashoffset = String(80 * (1 - easeInOut(seg(t, 26.65, 27.1))));
+    ring(ring1, seg(t, 26.85, 27.95), 0.8, 0.8);
+    ring(ring2, seg(t, 27.25, 28.35), 0.8, 0.6);
   }
 
   const filmWindow = window as FilmWindow;

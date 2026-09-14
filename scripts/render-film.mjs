@@ -2,7 +2,7 @@
 /**
  * Renders the hero film from the dev-only page /film/guard/ into video files.
  *
- *   npm run film:render                      full 18s loop -> public/video/guard-film.{mp4,webm} + poster
+ *   npm run film:render                      full 30s loop -> public/video/guard-film.{mp4,webm} + poster
  *   npm run film:render -- --frames 1,6,10   PNG stills -> .film/stills/
  *   npm run film:render -- --from 4 --to 8   test clip  -> .film/clip.mp4
  *
@@ -18,7 +18,7 @@ import ffmpegStatic from 'ffmpeg-static';
 
 const WIDTH = 960;
 const HEIGHT = 1128;
-const POSTER_TIME = 6;
+const POSTER_TIME = 13.7;
 
 function parseArgs(argv) {
   const args = {};

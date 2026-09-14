@@ -1,0 +1,80 @@
+---
+/**
+ * Front-facing version of GuardFigure: same palette, 120×200 space, feet at y≈192, centred on x=62.
+ * Renders only a <g>. The saluting (right) arm is posed by the parent in the inner coordinates:
+ * .gf-arm-salute rotates around the shoulder (44 58), .gf-forearm around the elbow (44 86).
+ */
+const c = {
+  skin: '#C68B64',
+  skinShade: '#A9714F',
+  hair: '#2B1D16',
+  cap: '#0E182D',
+  brim: '#080E1C',
+  orange: '#F7981D',
+  shirt: '#2F4272',
+  shirtShade: '#223257',
+  sleeve: '#3A5088',
+  trousers: '#26375E',
+  trousersBack: '#1A2746',
+  shoe: '#1B2233',
+  dark: '#070C18',
+  buckle: '#C5CDDC',
+};
+---
+
+<g class="guard-front">
+  <g transform="translate(2 0)">
+    <!-- legs -->
+    <path d="M47 110 H59 L58.5 186 H48 Z" fill={c.trousersBack}></path>
+    <path d="M61 110 H73 L72 186 H61.5 Z" fill={c.trousers}></path>
+    <path d="M48 184 H58.5 C60 186 60 189 59.5 192 H44 C44 188 45.5 185.5 48 184 Z" fill={c.shoe}></path>
+    <path d="M61.5 184 H72 C74.5 185.5 76 188 76 192 H60.5 C60 189 60 186 61.5 184 Z" fill={c.shoe}></path>
+
+    <!-- left arm (viewer's right), resting -->
+    <path
+      d="M74 57 C80 57 83 61 83.5 67 L85 104 C85 107 83 109 80.5 109 C78 109 76 107 76 104 L73 66 Z"
+      fill={c.sleeve}></path>
+    <circle cx="80.5" cy="111" r="4.6" fill={c.skin}></circle>
+
+    <!-- torso -->
+    <path d="M41 64 C41 56 47 53 53 53 H67 C73 53 79 56 79 64 L77 112 H43 Z" fill={c.shirt}></path>
+    <path d="M41 64 C41 56 47 53 53 53 L50 112 H43 Z" fill={c.shirtShade}></path>
+    <path d="M53 53 L60 62 L67 53 H64 L60 57.5 L56 53 Z" fill={c.sleeve}></path>
+    <!-- lion shield badge -->
+    <path d="M65 67 H74 V72 C74 76 71.5 78.5 69.5 79.5 C67.5 78.5 65 76 65 72 Z" fill={c.orange}></path>
+    <path
+      d="M67.2 69 H71.8 V72.2 C71.8 74.3 70.6 75.8 69.5 76.5 C68.4 75.8 67.2 74.3 67.2 72.2 Z"
+      fill={c.cap}></path>
+    <!-- shoulder radio -->
+    <rect x="46.5" y="55" width="1.8" height="8" rx="0.9" fill={c.dark}></rect>
+    <rect x="45" y="61" width="7" height="11" rx="1.8" fill={c.dark}></rect>
+    <circle cx="48.5" cy="64" r="1.3" fill={c.orange}></circle>
+    <!-- belt -->
+    <rect x="42" y="106" width="36" height="7" rx="1" fill={c.dark}></rect>
+    <rect x="57" y="107.5" width="6" height="4" rx="0.8" fill={c.buckle}></rect>
+
+    <!-- head -->
+    <rect x="55" y="45" width="10" height="10" fill={c.skinShade}></rect>
+    <circle cx="47" cy="36.5" r="2.8" fill={c.skinShade}></circle>
+    <circle cx="73" cy="36.5" r="2.8" fill={c.skinShade}></circle>
+    <circle cx="60" cy="35" r="13" fill={c.skin}></circle>
+    <path d="M47 32 C47 39 48.5 43.5 51 45.5 L52 32 Z" fill={c.hair}></path>
+    <path d="M73 32 C73 39 71.5 43.5 69 45.5 L68 32 Z" fill={c.hair}></path>
+    <circle cx="55.5" cy="38" r="1.3" fill={c.dark}></circle>
+    <circle cx="64.5" cy="38" r="1.3" fill={c.dark}></circle>
+    <!-- cap -->
+    <path d="M46 31 C46 18 53 13 60 13 C67 13 74 18 74 31 Z" fill={c.cap}></path>
+    <rect x="46" y="26.5" width="28" height="4.5" fill={c.orange}></rect>
+    <path d="M44 30.5 H76 C77.5 30.5 77.5 34 75.5 34 H44.5 C42.5 34 42.5 30.5 44 30.5 Z" fill={c.brim}></path>
+    <circle cx="60" cy="20" r="2.4" fill={c.orange}></circle>
+
+    <!-- right arm (viewer's left), posed for the salute -->
+    <g class="gf-arm-salute">
+      <rect x="39.5" y="54" width="9" height="36" rx="4.5" fill={c.sleeve}></rect>
+      <g class="gf-forearm">
+        <rect x="40" y="82" width="8" height="32" rx="4" fill={c.sleeve}></rect>
+        <circle cx="44" cy="115" r="4.6" fill={c.skin}></circle>
+      </g>
+    </g>
+  </g>
+</g>
