@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import teamBriefing from '../../assets/team/team-briefing.jpg';
 import PageHero from '../PageHero.astro';
 import Icon from '../Icon.astro';
 import ApplicationForm from '../ApplicationForm.astro';
@@ -52,9 +54,18 @@ const jobSections = (job: JobEntry) => [
 
   <section class="section bg-white">
     <div class="container-page">
-      <div class="max-w-2xl">
-        <p class="eyebrow">{c.benefitsEyebrow}</p>
-        <h2 class="section-title">{c.benefitsTitle}</h2>
+      <div class="grid items-end gap-8 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <p class="eyebrow">{c.benefitsEyebrow}</p>
+          <h2 class="section-title">{c.benefitsTitle}</h2>
+        </div>
+        <Image
+          src={teamBriefing}
+          alt={c.photoAlt}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 64rem) 50vw, 100vw"
+          class="aspect-[16/9] w-full rounded-2xl object-cover shadow-xl shadow-navy-900/10"
+        />
       </div>
       <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {

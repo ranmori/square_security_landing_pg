@@ -66,6 +66,12 @@ export const de = {
     referencesEyebrow: 'Referenzen',
     referencesTitle: 'Im Einsatz für Veranstaltungen',
     referencesLead: 'Eine Auswahl unserer Einsätze im Veranstaltungsschutz.',
+    teamPhotoAlt: 'Das Team von Square Security in Warnwesten vor dem Firmenaufsteller',
+    teamPhotoCaption: 'Unser Team',
+    eventPhotos: [
+      { alt: 'Zwei Sicherheitskräfte von Square Security am Einlass einer Veranstaltung', caption: 'Einlass bei einem Fest in Zell (Üchtelhausen)' },
+      { alt: 'Zwei Sicherheitskräfte von Square Security auf einem Festgelände mit Zelten', caption: 'Ordnungsdienst auf dem Festgelände' },
+    ],
     references: [
       {
         title: 'Oktoberfest 2023',
@@ -168,6 +174,7 @@ export const de = {
     lead: 'Sie möchten Verantwortung übernehmen und Menschen schützen? Wir suchen zuverlässige Verstärkung für unser Team in Schweinfurt und Umgebung.',
     benefitsEyebrow: 'Ihr Arbeitsplatz',
     benefitsTitle: 'Warum Square Security?',
+    photoAlt: 'Mitarbeitende von Square Security im Gespräch vor dem Firmenaufsteller',
     benefits: [
       { title: 'Schulungen', text: 'Einarbeitung und Schulungen, unter anderem in Deeskalation und Kommunikation.' },
       { title: 'Flexible Einsätze', text: 'Vollzeit, Teilzeit oder Minijob – mit Einsatzzeiten, die zu Ihrem Leben passen.' },

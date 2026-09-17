@@ -68,6 +68,12 @@ export const en: Dict = {
     referencesEyebrow: 'References',
     referencesTitle: 'Protecting events',
     referencesLead: 'A selection of our event security assignments.',
+    teamPhotoAlt: 'The Square Security team in high-visibility vests in front of the company sign',
+    teamPhotoCaption: 'Our team',
+    eventPhotos: [
+      { alt: 'Two Square Security officers at the entrance of an event', caption: 'Entrance control at a festival in Zell (Üchtelhausen)' },
+      { alt: 'Two Square Security officers on a festival site with marquees', caption: 'Stewarding on the festival grounds' },
+    ],
     references: [
       {
         title: 'Oktoberfest 2023',
@@ -170,6 +176,7 @@ export const en: Dict = {
     lead: 'Want to take on responsibility and protect people? We are looking for reliable new team members in and around Schweinfurt.',
     benefitsEyebrow: 'Your workplace',
     benefitsTitle: 'Why Square Security?',
+    photoAlt: 'Square Security staff talking in front of the company sign',
     benefits: [
       { title: 'Training', text: 'Induction and training, including de-escalation and communication.' },
       { title: 'Flexible shifts', text: 'Full-time, part-time or mini-job – with working hours that fit your life.' },
