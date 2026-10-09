@@ -1,5 +1,8 @@
 ---
 import CareersPage from '../components/pages/CareersPage.astro';
+
+// Rendered per request so the Turnstile key can come from the runtime secrets.
+export const prerender = false;
 ---
 
 <CareersPage lang="de" />

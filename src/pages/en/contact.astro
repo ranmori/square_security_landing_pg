@@ -1,5 +1,8 @@
 ---
 import ContactPage from '../../components/pages/ContactPage.astro';
+
+// Rendered per request so the Turnstile key can come from the runtime secrets.
+export const prerender = false;
 ---
 
 <ContactPage lang="en" />

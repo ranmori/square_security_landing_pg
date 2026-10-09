@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
-import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
-import { CONTACT_TO_EMAIL, RESEND_API_KEY, TURNSTILE_SECRET_KEY } from 'astro:env/server';
+import { CONTACT_TO_EMAIL, PUBLIC_TURNSTILE_SITE_KEY, RESEND_API_KEY, TURNSTILE_SECRET_KEY } from 'astro:env/server';
 
 export const prerender = false;
 
