@@ -17,11 +17,16 @@ const mediaTypes: Record<string, string> = {
 
 type AssetFetcher = { fetch: (input: Request) => Promise<Response> };
 
+let lastRuntimeNote = 'unknown';
+
 function assetFetcher(locals: App.Locals): AssetFetcher | undefined {
   try {
     // The dev server has no Cloudflare runtime and serves public/ itself.
-    return (locals as { runtime?: { env?: { ASSETS?: AssetFetcher } } }).runtime?.env?.ASSETS;
-  } catch {
+    const runtime = (locals as { runtime?: { env?: Record<string, unknown> } }).runtime;
+    lastRuntimeNote = runtime ? `env:[${Object.keys(runtime.env ?? {}).join('|')}]` : 'no-runtime';
+    return runtime?.env?.ASSETS as AssetFetcher | undefined;
+  } catch (error) {
+    lastRuntimeNote = `error:${(error as Error).message.slice(0, 80)}`;
     return undefined;
   }
 }
@@ -36,7 +41,9 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
   let asset = await (binding?.fetch(source) ?? fetch(source));
   // Fall back to the public URL if the binding cannot serve the file.
   if (!asset.ok && binding) asset = await fetch(source);
-  if (!asset.ok) return new Response(`Not found (${file}, ${binding ? 'binding' : 'fetch'}, ${asset.status})`, { status: 404 });
+  if (!asset.ok) {
+    return new Response(`Not found (${file}, ${binding ? 'binding' : 'fetch'}, ${asset.status}, ${lastRuntimeNote})`, { status: 404 });
+  }
 
   const body = await asset.arrayBuffer();
   const total = body.byteLength;
