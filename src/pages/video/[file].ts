@@ -32,8 +32,11 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
   if (!contentType) return new Response('Not found', { status: 404 });
 
   const source = new Request(new URL(`/media/${file}`, request.url));
-  const asset = await (assetFetcher(locals)?.fetch(source) ?? fetch(source));
-  if (!asset.ok) return new Response('Not found', { status: 404 });
+  const binding = assetFetcher(locals);
+  let asset = await (binding?.fetch(source) ?? fetch(source));
+  // Fall back to the public URL if the binding cannot serve the file.
+  if (!asset.ok && binding) asset = await fetch(source);
+  if (!asset.ok) return new Response(`Not found (${file}, ${binding ? 'binding' : 'fetch'}, ${asset.status})`, { status: 404 });
 
   const body = await asset.arrayBuffer();
   const total = body.byteLength;
