@@ -15,7 +15,7 @@ export default defineConfig({
     imageService: 'compile',
   }),
 
-  integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
+  integrations: [sitemap({ filter: (page) => !page.includes('/404') && !page.includes('/status') })],
 
   security: {
     // Job applications upload CVs (max 5 MB of files); Astro's default action limit is 1 MB.
@@ -24,6 +24,8 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // Lets /status/ report which build is live.
+    define: { 'import.meta.env.BUILD_TIME': JSON.stringify(new Date().toISOString()) },
   },
 
   // Old WordPress URLs
