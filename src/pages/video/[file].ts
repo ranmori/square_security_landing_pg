@@ -17,33 +17,26 @@ const mediaTypes: Record<string, string> = {
 
 type AssetFetcher = { fetch: (input: Request) => Promise<Response> };
 
-let lastRuntimeNote = 'unknown';
-
-function assetFetcher(locals: App.Locals): AssetFetcher | undefined {
+/** The static-asset binding, which only exists in the Workers runtime. */
+async function assetFetcher(): Promise<AssetFetcher | undefined> {
   try {
-    // The dev server has no Cloudflare runtime and serves public/ itself.
-    const runtime = (locals as { runtime?: { env?: Record<string, unknown> } }).runtime;
-    lastRuntimeNote = runtime ? `env:[${Object.keys(runtime.env ?? {}).join('|')}]` : 'no-runtime';
-    return runtime?.env?.ASSETS as AssetFetcher | undefined;
-  } catch (error) {
-    lastRuntimeNote = `error:${(error as Error).message.slice(0, 80)}`;
+    const { env } = await import('cloudflare:workers');
+    return (env as { ASSETS?: AssetFetcher }).ASSETS;
+  } catch {
+    // The dev server has no Workers runtime and serves public/ itself.
     return undefined;
   }
 }
 
-export const GET: APIRoute = async ({ params, request, locals }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const file = params.file ?? '';
   const contentType = mediaTypes[file];
   if (!contentType) return new Response('Not found', { status: 404 });
 
   const source = new Request(new URL(`/media/${file}`, request.url));
-  const binding = assetFetcher(locals);
-  let asset = await (binding?.fetch(source) ?? fetch(source));
-  // Fall back to the public URL if the binding cannot serve the file.
-  if (!asset.ok && binding) asset = await fetch(source);
-  if (!asset.ok) {
-    return new Response(`Not found (${file}, ${binding ? 'binding' : 'fetch'}, ${asset.status}, ${lastRuntimeNote})`, { status: 404 });
-  }
+  const binding = await assetFetcher();
+  const asset = await (binding?.fetch(source) ?? fetch(source));
+  if (!asset.ok) return new Response('Not found', { status: 404 });
 
   const body = await asset.arrayBuffer();
   const total = body.byteLength;
