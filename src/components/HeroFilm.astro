@@ -17,10 +17,11 @@ const t = useTranslations(lang);
     height="1128"
     muted
     loop
+    autoplay
     playsinline
     webkit-playsinline
     disablepictureinpicture
-    preload="none"
+    preload="metadata"
     poster="/media/guard-film-poster.jpg"
     aria-label={t.home.illustrationAlt}
   >
@@ -93,10 +94,24 @@ const t = useTranslations(lang);
     const start = () => {
       video.preload = 'auto';
       return video.play().catch(() => {
-        // Refused (iPhone Low Power Mode, data saver, browser policy): keep the poster and offer the button.
-        autoplay = false;
+        // Refused (iPhone Low Power Mode, browser policy): keep the poster, offer the button
+        // and try again on the visitor's first interaction, which counts as permission.
         render();
+        retryOnInteraction();
       });
+    };
+
+    let retryArmed = false;
+    const retryOnInteraction = () => {
+      if (retryArmed || !autoplay) return;
+      retryArmed = true;
+      const events = ['pointerdown', 'touchstart', 'keydown', 'scroll'] as const;
+      const retry = () => {
+        events.forEach((event) => window.removeEventListener(event, retry));
+        retryArmed = false;
+        if (visible && autoplay && !userPaused && video.paused) void start();
+      };
+      events.forEach((event) => window.addEventListener(event, retry, { once: true, passive: true }));
     };
 
     video.addEventListener('play', render);
@@ -121,7 +136,8 @@ const t = useTranslations(lang);
         if (visible && autoplay && !userPaused) void start();
         else if (!visible) video.pause();
       },
-      { threshold: 0.25 },
+      // A low threshold: on a phone the film card is taller than the screen.
+      { threshold: 0.05 },
     ).observe(video);
 
     document.addEventListener('visibilitychange', () => {
