@@ -13,7 +13,7 @@ interface Props {
 
 const { lang, page, title } = Astro.props;
 const t = useTranslations(lang);
-const site = Astro.site ?? new URL('https://square-security.de');
+const site = Astro.site ?? new URL('https://square-security.com');
 const crumbs = [{ label: t.nav.home, href: pagePath('home', lang) }, { label: title }];
 ---
 

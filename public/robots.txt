@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://square-security.de/sitemap-index.xml
+Sitemap: https://square-security.com/sitemap-index.xml

@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://square-security.de',
+  site: 'https://square-security.com',
   trailingSlash: 'always',
   // Keep HTML-aware whitespace handling so inline text keeps its spaces.
   compressHTML: true,
@@ -45,7 +45,7 @@ export default defineConfig({
       CONTACT_FROM_EMAIL: envField.string({
         context: 'server',
         access: 'public',
-        default: 'Square Security Website <website@square-security.de>',
+        default: 'Square Security Website <website@square-security.com>',
       }),
     },
   },

@@ -22,7 +22,7 @@ interface Props {
 
 const { lang, title, description, alternates, noindex = false, jsonLd = [], ogImage } = Astro.props;
 const t = useTranslations(lang);
-const site = Astro.site ?? new URL('https://square-security.de');
+const site = Astro.site ?? new URL('https://square-security.com');
 const fullTitle = title ? `${title} | ${t.meta.brandName}` : t.meta.defaultTitle;
 const metaDescription = description ?? t.meta.defaultDescription;
 const canonical = new URL(alternates?.[lang] ?? Astro.url.pathname, site).href;

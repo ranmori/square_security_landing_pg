@@ -22,7 +22,7 @@ const data = service.data;
 const { Content } = await render(service);
 const others = (await getServices(lang)).filter((entry) => entry.data.key !== data.key);
 const phone = phoneLabel(lang);
-const site = Astro.site ?? new URL('https://square-security.de');
+const site = Astro.site ?? new URL('https://square-security.com');
 const crumbs = [
   { label: t.nav.home, href: pagePath('home', lang) },
   { label: t.nav.services, href: pagePath('services', lang) },

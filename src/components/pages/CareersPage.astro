@@ -18,7 +18,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const c = t.careers;
 const jobs = await getJobs(lang);
-const site = Astro.site ?? new URL('https://square-security.de');
+const site = Astro.site ?? new URL('https://square-security.com');
 const careersPath = pagePath('careers', lang);
 
 const crumbs = [{ label: t.nav.home, href: pagePath('home', lang) }, { label: t.nav.careers }];
