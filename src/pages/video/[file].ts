@@ -1,16 +1,18 @@
-import type { MiddlewareHandler } from 'astro';
+import type { APIRoute } from 'astro';
+
+export const prerender = false;
 
 /**
  * Serves the hero film with byte-range support.
  *
  * Cloudflare's static assets answer a range request with the whole file, and Safari refuses to
  * start a video it cannot probe that way. The files therefore live in public/media/ and are
- * served from here, before routing, so their URLs keep their file extension.
+ * served from here. Note that `trailingSlash: 'always'` applies to this route too, so the
+ * video URLs end in a slash.
  */
 const mediaTypes: Record<string, string> = {
   'guard-film.mp4': 'video/mp4',
   'guard-film.webm': 'video/webm',
-  'guard-film-poster.jpg': 'image/jpeg',
 };
 
 type AssetFetcher = { fetch: (input: Request) => Promise<Response> };
@@ -24,7 +26,11 @@ function assetFetcher(locals: App.Locals): AssetFetcher | undefined {
   }
 }
 
-async function serveMedia(file: string, request: Request, locals: App.Locals): Promise<Response> {
+export const GET: APIRoute = async ({ params, request, locals }) => {
+  const file = params.file ?? '';
+  const contentType = mediaTypes[file];
+  if (!contentType) return new Response('Not found', { status: 404 });
+
   const source = new Request(new URL(`/media/${file}`, request.url));
   const asset = await (assetFetcher(locals)?.fetch(source) ?? fetch(source));
   if (!asset.ok) return new Response('Not found', { status: 404 });
@@ -32,7 +38,7 @@ async function serveMedia(file: string, request: Request, locals: App.Locals): P
   const body = await asset.arrayBuffer();
   const total = body.byteLength;
   const headers = new Headers({
-    'Content-Type': mediaTypes[file],
+    'Content-Type': contentType,
     'Accept-Ranges': 'bytes',
     'Cache-Control': 'public, max-age=604800',
   });
@@ -56,10 +62,4 @@ async function serveMedia(file: string, request: Request, locals: App.Locals): P
 
   headers.set('Content-Length', String(total));
   return new Response(body, { status: 200, headers });
-}
-
-export const onRequest: MiddlewareHandler = (context, next) => {
-  const file = /^\/video\/([A-Za-z0-9._-]+)$/.exec(context.url.pathname)?.[1];
-  if (file && file in mediaTypes) return serveMedia(file, context.request, context.locals);
-  return next();
 };

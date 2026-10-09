@@ -21,12 +21,12 @@ const t = useTranslations(lang);
     webkit-playsinline
     disablepictureinpicture
     preload="none"
-    poster="/video/guard-film-poster.jpg"
+    poster="/media/guard-film-poster.jpg"
     aria-label={t.home.illustrationAlt}
   >
     <!-- MP4 first: iOS Safari may pick a WebM it cannot decode and never fall back. -->
-    <source src="/video/guard-film.mp4" type='video/mp4; codecs="avc1.4d4028"' />
-    <source src="/video/guard-film.webm" type="video/webm" />
+    <source src="/video/guard-film.mp4/" type='video/mp4; codecs="avc1.4d4028"' />
+    <source src="/video/guard-film.webm/" type="video/webm" />
   </video>
 
   <button
