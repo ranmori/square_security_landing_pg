@@ -76,7 +76,7 @@ try {
     const from = Number(args.from ?? 0);
     const to = Number(args.to ?? duration);
     const isClip = args.from !== undefined || args.to !== undefined;
-    const outDir = path.resolve(isClip ? '.film' : 'public/video');
+    const outDir = path.resolve(isClip ? '.film' : 'public/media');
     await mkdir(outDir, { recursive: true });
 
     const outputs = isClip
