@@ -25,7 +25,10 @@ const t = useTranslations(lang);
     poster="/media/guard-film-poster.jpg"
     aria-label={t.home.illustrationAlt}
   >
-    <!-- MP4 first: iOS Safari may pick a WebM it cannot decode and never fall back. -->
+    <!-- Phones get a smaller file so the film does not slow the page down on mobile data.
+         MP4 first: iOS Safari may pick a WebM it cannot decode and never fall back. -->
+    <source media="(max-width: 768px)" src="/video/guard-film-mobile.mp4/" type='video/mp4; codecs="avc1.4d401f"' />
+    <source media="(max-width: 768px)" src="/video/guard-film-mobile.webm/" type="video/webm" />
     <source src="/video/guard-film.mp4/" type='video/mp4; codecs="avc1.4d4028"' />
     <source src="/video/guard-film.webm/" type="video/webm" />
   </video>

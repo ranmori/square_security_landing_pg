@@ -13,6 +13,8 @@ export const prerender = false;
 const mediaTypes: Record<string, string> = {
   'guard-film.mp4': 'video/mp4',
   'guard-film.webm': 'video/webm',
+  'guard-film-mobile.mp4': 'video/mp4',
+  'guard-film-mobile.webm': 'video/webm',
 };
 
 type AssetFetcher = { fetch: (input: Request) => Promise<Response> };
