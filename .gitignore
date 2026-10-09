@@ -23,3 +23,6 @@ npm-debug.log*
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+# Editor workspace file
+square_security_web.code-workspace
