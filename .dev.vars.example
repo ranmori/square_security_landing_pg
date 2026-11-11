@@ -4,3 +4,5 @@ PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 # Leave empty in development: submitted enquiries are logged to the console instead of emailed.
 RESEND_API_KEY=
+# Secret for the /status/ deployment check (any long random string).
+STATUS_TOKEN=local-test-token
